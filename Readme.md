@@ -1,7 +1,7 @@
 # Проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Сергей Волков](https://up.htmlacademy.ru/ecmascript/13/user/668021).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Колодеев].(https://up.htmlacademy.ru/ecmascript/13/user/436983).
 
 ---
 
