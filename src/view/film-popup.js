@@ -1,4 +1,4 @@
-export const createFilmPopupTemplate = () => {
+export const createFilmPopupTemplate = (film, comments) => {
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
@@ -7,7 +7,7 @@ export const createFilmPopupTemplate = () => {
       </div>
       <div class="film-details__info-wrap">
         <div class="film-details__poster">
-          <img class="film-details__poster-img" src="./images/posters/the-great-flamarion.jpg" alt="">
+          <img class="film-details__poster-img" src="${film[`poster`]}" alt="${film[`poster`]}">
 
           <p class="film-details__age">18+</p>
         </div>
