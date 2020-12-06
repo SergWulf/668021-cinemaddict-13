@@ -83,7 +83,7 @@ for (let i = 0; i < FILM_MOST_COUNT; i++) {
 const searchFilmId = (id) => {
   const searchFilm = [];
   films.forEach((film) => {
-    if (film[`id`] == id) {
+    if (film[`id`] === id) {
       searchFilm.push(film);
     };
   });
@@ -109,7 +109,7 @@ document.querySelectorAll(`.film-card`).forEach((card) => {
     // все отображение на страничке
     // ...
     // 1. Считать атрбиут ID.
-    const filmId = card.getAttribute(`data-id`);
+    const filmId = card.getAttribute(`data-id`).toString();
     const clickFilm = searchFilmId(filmId);
     console.log(clickFilm);
     const commentsFilm = searchCommentsFilmId(filmId)

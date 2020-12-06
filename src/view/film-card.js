@@ -1,8 +1,7 @@
 export const createFilmCardTemplate = (film) => {
-  console.log(film);
   return `<article class="film-card" data-id="${film[`id`]}">
           <h3 class="film-card__title">${film[`title`]}</h3>
-          <p class="film-card__rating">8.9</p>
+          <p class="film-card__rating">${film[`rating`]}</p>
           <p class="film-card__info">
             <span class="film-card__year">1945</span>
             <span class="film-card__duration">1h 18m</span>

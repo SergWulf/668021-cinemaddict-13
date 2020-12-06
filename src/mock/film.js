@@ -114,23 +114,43 @@ const generateDescription = () => {
   return shuffle(listSentences).slice(0, getRandomInteger(1, 5)).join(`. `);
 };
 
+const generateRating = () => {
+  return `${getRandomInteger(5, 9)}.${getRandomInteger(0, 9)}`;
+}
+
+const generateGenres = () => {
+  const genres = [
+    `action`,
+    `comedy`,
+    `drama`,
+    `fantasy`,
+    `horror`,
+    `mystery`,
+    `romance`,
+    `thriller`,
+    `western`
+  ];
+
+  return shuffle(genres).slice(0, getRandomInteger(1, 3));
+};
+
 
 export const generateFilm = () => {
   return {
     id: nanoid(),
     poster: generatePoster(),
     title: generateTitle(),
-    originalTitle: ``,
-    rating: null,
+    originalTitle: `Original Title`,
+    rating: generateRating(),
     director: generateDirector(),
     screenwriters: generateScreenwriters(),
-    castOfActors: generateActors(),
-    realiseDate: `1957`,
+    actors: generateActors(),
+    release: `1957`,
     runtime: `1h 15m`,
     country: `USA`,
-    genres: `drama`,
+    genres: generateGenres(),
     description: `${generateDescription()}.`,
-    ageRating: null,
+    ageRating: `+18`,
     isWatchList: false,
     isWatched: false,
     isFavorite: false
