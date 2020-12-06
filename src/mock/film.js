@@ -120,15 +120,15 @@ const generateRating = () => {
 
 const generateGenres = () => {
   const genres = [
-    `action`,
-    `comedy`,
-    `drama`,
-    `fantasy`,
-    `horror`,
-    `mystery`,
-    `romance`,
-    `thriller`,
-    `western`
+    `Action`,
+    `Comedy`,
+    `Drama`,
+    `Fantasy`,
+    `Horror`,
+    `Mystery`,
+    `Romance`,
+    `Thriller`,
+    `Western`
   ];
 
   return shuffle(genres).slice(0, getRandomInteger(1, 3));
