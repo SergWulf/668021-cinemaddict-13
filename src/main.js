@@ -1,5 +1,5 @@
 import {createHeaderProfileTemplate} from "./view/header-profile.js";
-import {createMainMenuTemplate} from "./view/main-menu.js";
+import {createMainFilterTemplate} from "./view/main-filter.js";
 import {createMainSortTemplate} from "./view/main-sort.js";
 import {createMainContentTemplate} from "./view/main-content.js";
 import {createFilmCardTemplate} from "./view/film-card.js";
@@ -39,6 +39,7 @@ for (let i = 0; i < 25; i++) {
 const FILM_COUNT = 5;
 const FILM_TOP_COUNT = 2;
 const FILM_MOST_COUNT = 2;
+let countRenderCardFilms = 0;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -49,35 +50,9 @@ const siteMain = document.querySelector(`main`);
 
 
 render(siteHeader, createHeaderProfileTemplate(), `beforeend`);
-render(siteMain, createMainMenuTemplate(), `beforeend`);
+render(siteMain, createMainFilterTemplate(), `beforeend`);
 render(siteMain, createMainSortTemplate(), `beforeend`);
 render(siteMain, createMainContentTemplate(), `beforeend`);
-
-// Отрисовка общего списка фильмов
-const filmContainerHead = document.querySelector(`.films-list:nth-of-type(1) .films-list__container`);
-for (let i = 0; i < FILM_COUNT; i++) {
-  render(filmContainerHead, createFilmCardTemplate(films[i]), `beforeend`);
-}
-render(filmContainerHead, createButtonShowMoreTemplate(), `beforeend`);
-
-// Отрисовка колонки с фильмами ТОР
-const filmContainerTop = document.querySelector(`.films-list:nth-of-type(2) .films-list__container`);
-for (let i = 0; i < FILM_TOP_COUNT; i++) {
-  render(filmContainerTop, createFilmCardTemplate(films[i]), `beforeend`);
-}
-
-// Отрисовска колонки с фильмами MOST
-const filmContainerMost = document.querySelector(`.films-list:nth-of-type(3) .films-list__container`);
-for (let i = 0; i < FILM_MOST_COUNT; i++) {
-  render(filmContainerMost, createFilmCardTemplate(films[i]), `beforeend`);
-}
-
-
-/*
-  1. Вешаем обработчик на каждую картинку в карточке
-  2. Обработчик вызывает отрисовку popup.
-  3. При нажатии на крестик в попапе, он удаляется из разметки.
- */
 
 // Функция поиска фильма по id
 const searchFilmId = (id) => {
@@ -100,6 +75,54 @@ const searchCommentsFilmId = (id) => {
   });
   return commentsFilm;
 };
+
+const renderCardsFilms = (filmContainer, films, count) => {
+  // Проверка 1
+  // Если есть кнопка в разметке, то удаляем ее.
+  const showMore = filmContainer.querySelector(`.films-list__show-more`);
+  if (showMore) {
+    showMore.parentElement.removeChild(showMore);
+  }
+  // Отрисовка заданного количества фильмов
+  for (let i = countRenderCardFilms; i < (countRenderCardFilms + count); i++) {
+    const countComments = searchCommentsFilmId(films[i][`id`]).length;
+    render(filmContainer, createFilmCardTemplate(films[i], countComments), `beforeend`);
+  }
+  // Проверка №2
+  // Если контейнер для отображения фильмов главный,
+  // и количество отображенных фильмов меньше общего количества фильмов,
+  // то рисуем кнопку show more, иначе кнопка не нужна
+  countRenderCardFilms = filmContainer.querySelectorAll(`.film-card`).length;
+  if ((filmContainer.classList.contains(`all-movies`)) && (countRenderCardFilms < films.length)) {
+    render(filmContainer, createButtonShowMoreTemplate(), `beforeend`);
+    // Вешаем обработичк на кнопку show-more
+    filmContainer.querySelector(`.films-list__show-more`).addEventListener(`click`, () => {
+      renderCardsFilms(filmContainer, films, FILM_COUNT);
+    });
+  }
+}
+
+// Отрисовка общего списка фильмов
+const filmContainerHead = document.querySelector(`.films-list:nth-of-type(1) .films-list__container`);
+renderCardsFilms(filmContainerHead, films, FILM_COUNT);
+
+
+
+// Отрисовка колонки с фильмами ТОР
+const filmContainerTop = document.querySelector(`.films-list:nth-of-type(2) .films-list__container`);
+renderCardsFilms(filmContainerTop, films, FILM_TOP_COUNT);
+
+// Отрисовска колонки с фильмами MOST
+const filmContainerMost = document.querySelector(`.films-list:nth-of-type(3) .films-list__container`);
+renderCardsFilms(filmContainerMost, films, FILM_MOST_COUNT);
+
+
+/*
+  1. Вешаем обработчик на каждую картинку в карточке
+  2. Обработчик вызывает отрисовку popup.
+  3. При нажатии на крестик в попапе, он удаляется из разметки.
+ */
+
 
 const footerContainer = document.querySelector(`footer`);
 document.querySelectorAll(`.film-card`).forEach((card) => {

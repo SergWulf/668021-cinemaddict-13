@@ -134,6 +134,67 @@ const generateGenres = () => {
   return shuffle(genres).slice(0, getRandomInteger(1, 3));
 };
 
+const generateYear = () => {
+  return getRandomInteger(1930, 2020);
+};
+
+const generateRuntime = () => {
+  const hour = getRandomInteger(1, 2);
+  let minutes = getRandomInteger(0, 59);
+  if (minutes < 10) {
+    minutes = `0${minutes.toString()}`;
+  };
+  return `${hour}h ${minutes}m`
+};
+
+const generateCountries = () => {
+  const countries = [
+    `Armenia`,
+    `Austria`,
+    `Azerbaijan`,
+    `Belarus`,
+    `Belgium`,
+    `Bulgaria`,
+    `Croatia`,
+    `Czech Republic`,
+    `Denmark`,
+    `Estonia`,
+    `Finland`,
+    `France`,
+    `Georgia`,
+    `Germany`,
+    `Greece`,
+    `Hungary`,
+    `Iceland`,
+    `Ireland`,
+    `Italy`,
+    `Latvia`,
+    `The Netherlands`,
+    `Norway`,
+    `Poland`,
+    `Portugal`,
+    `Romania`,
+    `Russia`,
+    `Slovakia`,
+    `Slovenia`,
+    `Spain`,
+    `Sweden`,
+    `Switzerland`,
+    `Turkey`,
+    `Ukraine`,
+    `United Kingdom`,
+    `USA`,
+    `Canada`,
+    `Mexico`
+  ];
+
+  return shuffle(countries).slice(0, getRandomInteger(1, 3)).join(`, `);
+}
+
+const generateRandomBoolean = () => {
+  return Math.random() < 0.5;
+}
+
 
 export const generateFilm = () => {
   return {
@@ -145,14 +206,14 @@ export const generateFilm = () => {
     director: generateDirector(),
     screenwriters: generateScreenwriters(),
     actors: generateActors(),
-    release: `1957`,
-    runtime: `1h 15m`,
-    country: `USA`,
+    release: generateYear(),
+    runtime: generateRuntime(),
+    countries: generateCountries(),
     genres: generateGenres(),
     description: `${generateDescription()}.`,
     ageRating: `+18`,
-    isWatchList: false,
-    isWatched: false,
-    isFavorite: false
+    isWatchList: generateRandomBoolean(),
+    isWatched: generateRandomBoolean(),
+    isFavorite: generateRandomBoolean()
   };
 };
