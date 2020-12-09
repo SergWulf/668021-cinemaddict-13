@@ -7,12 +7,12 @@ export const createFilmPopupTemplate = (film, comments) => {
 
   // Функция отрисовки жанра
   const renderGenre = (genre) => {
-    return `<span class="film-details__genre">${genre}</span>`
+    return `<span class="film-details__genre">${genre}</span>`;
   };
 
   // Функция отрисовки всех жанров
   const renderGenres = (genres) => {
-    const getGenres =[];
+    const getGenres = [];
     genres.forEach((genre) => {
       getGenres.push(renderGenre(genre));
     });
@@ -33,10 +33,10 @@ export const createFilmPopupTemplate = (film, comments) => {
               </p>
             </div>
           </li>`;
-  }
+  };
 
   const renderComments = (comments) => {
-    const getComments =[];
+    const getComments = [];
     comments.forEach((comment) => {
       getComments.push(renderComment(comment));
     });

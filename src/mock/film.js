@@ -116,7 +116,7 @@ const generateDescription = () => {
 
 const generateRating = () => {
   return `${getRandomInteger(5, 9)}.${getRandomInteger(0, 9)}`;
-}
+};
 
 const generateGenres = () => {
   const genres = [
@@ -143,8 +143,8 @@ const generateRuntime = () => {
   let minutes = getRandomInteger(0, 59);
   if (minutes < 10) {
     minutes = `0${minutes.toString()}`;
-  };
-  return `${hour}h ${minutes}m`
+  }
+  return `${hour}h ${minutes}m`;
 };
 
 const generateCountries = () => {
@@ -189,12 +189,11 @@ const generateCountries = () => {
   ];
 
   return shuffle(countries).slice(0, getRandomInteger(1, 3)).join(`, `);
-}
+};
 
 const generateRandomBoolean = () => {
   return Math.random() < 0.5;
-}
-
+};
 
 export const generateFilm = () => {
   return {
