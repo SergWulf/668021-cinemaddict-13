@@ -4,7 +4,9 @@ const nanoid = (t = 21) => {
   let r = crypto.getRandomValues(new Uint8Array(t));
   for (; t--;) {
     let n = 63 & r[t];
-    e += n < 36 ? n.toString(36) : n < 62 ? (n - 26).toString(36).toUpperCase() : n < 63 ? `_` : `-`;
+    let tempExpressionOne = n < 63 ? `_` : `-`;
+    let tempExpressionTwo = n < 62 ? (n - 26).toString(36).toUpperCase() : tempExpressionOne;
+    e += n < 36 ? n.toString(36) : tempExpressionTwo;
   }
   return e;
 };
@@ -32,7 +34,7 @@ const shuffle = (arr) => {
 
 
 // Текст для заполнения описания к фильмам.
-export const textTemplate = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`;
+export const TEXT_TEMPLATE = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`;
 
 // Название фильмов
 const generateTitle = () => {
@@ -110,7 +112,7 @@ const generatePoster = () => {
 };
 
 const generateDescription = () => {
-  const listSentences = textTemplate.replace(/\.\s/g, `.`).split(`.`);
+  const listSentences = TEXT_TEMPLATE.replace(/\.\s/g, `.`).split(`.`);
   return shuffle(listSentences).slice(0, getRandomInteger(1, 5)).join(`. `);
 };
 

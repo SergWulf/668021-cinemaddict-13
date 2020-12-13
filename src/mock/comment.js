@@ -1,5 +1,5 @@
 import {getRandomInteger} from "./film.js";
-import {textTemplate} from "./film.js";
+import {TEXT_TEMPLATE} from "./film.js";
 
 const generateEmotion = () => {
   const emotions = [
@@ -32,7 +32,7 @@ const generateAuthor = () => {
 };
 
 const generateReview = () => {
-  const listComments = textTemplate.replace(/\.\s/g, `.`).split(`.`);
+  const listComments = TEXT_TEMPLATE.replace(/\.\s/g, `.`).split(`.`);
   return listComments[getRandomInteger(0, listComments.length - 1)];
 };
 

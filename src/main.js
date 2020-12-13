@@ -19,7 +19,6 @@ const comments = [];
 
 // Генерируем моки: фильмы и комментарии.
 for (let i = 0; i < 25; i++) {
-  // Генерируем фильм и добавляем его в массив
   films.push(generateFilm());
   // Генерируем кол-во комментарием к фильму от 0 до 5
   const commentCount = getRandomInt(6);
@@ -32,13 +31,6 @@ for (let i = 0; i < 25; i++) {
 
 // Генерируем фильтры для фильмов
 const filters = generateFilter(films);
-// .
-// Генерируем 25 фильмов. В каждой итерации создается объект "Фильм" и объект "Комментарии".
-// Каждый объект добавляю в массив. Созданные комментарии тоже добавляем в отдельный массив.
-// Для связи фильма и комментарием будет поле id. Допустим нужно в Popup вывести фильм, как
-// только он будет загружен в Popup, извлекаются все комментарии, которые принадлежат этому фильму
-// и прописываются в разметку.
-// .
 
 const FILM_COUNT = 5;
 const FILM_TOP_COUNT = 2;
@@ -51,7 +43,6 @@ const render = (container, template, place) => {
 
 const siteHeader = document.querySelector(`.header`);
 const siteMain = document.querySelector(`main`);
-
 
 render(siteHeader, createHeaderProfileTemplate(), `beforeend`);
 render(siteMain, createMainFilterTemplate(filters), `beforeend`);
@@ -80,7 +71,32 @@ const searchCommentsFilmId = (id) => {
   return commentsFilm;
 };
 
-const renderCardsFilms = (filmContainer, films, count) => {
+/*
+  1. Вешаем обработчик на каждую картинку в карточке
+  2. Обработчик вызывает отрисовку popup.
+  3. При нажатии на крестик в попапе, он удаляется из разметки.
+ */
+
+const createEventsForCardFilm = () => {
+  const footerContainer = document.querySelector(`footer`);
+  document.querySelectorAll(`.film-card`).forEach((card) => {
+    // Вешаем обработчик на картинку
+    card.children[3].addEventListener(`click`, () => {
+      const filmId = card.getAttribute(`data-id`).toString();
+      const clickFilm = searchFilmId(filmId);
+      const commentsFilm = searchCommentsFilmId(filmId);
+      render(footerContainer, createFilmPopupTemplate(clickFilm, commentsFilm), `afterend`);
+
+      const filmPopupClose = document.querySelector(`.film-details__close-btn`);
+      filmPopupClose.addEventListener(`click`, () => {
+        const filmPopup = document.querySelector(`.film-details`);
+        filmPopup.parentElement.removeChild(filmPopup);
+      });
+    });
+  });
+};
+
+const renderCardsFilms = (filmContainer, listFilms, count) => {
   // Проверка 1
   // Если есть кнопка в разметке, то удаляем ее.
   const showMore = filmContainer.querySelector(`.films-list__show-more`);
@@ -89,8 +105,8 @@ const renderCardsFilms = (filmContainer, films, count) => {
   }
   // Отрисовка заданного количества фильмов
   for (let i = countRenderCardFilms; i < (countRenderCardFilms + count); i++) {
-    const countComments = searchCommentsFilmId(films[i][`id`]).length;
-    render(filmContainer, createFilmCardTemplate(films[i], countComments), `beforeend`);
+    const countComments = searchCommentsFilmId(listFilms[i][`id`]).length;
+    render(filmContainer, createFilmCardTemplate(listFilms[i], countComments), `beforeend`);
   }
   // Проверка №2
   // Если контейнер для отображения фильмов главный,
@@ -99,52 +115,21 @@ const renderCardsFilms = (filmContainer, films, count) => {
   countRenderCardFilms = filmContainer.querySelectorAll(`.film-card`).length;
   if ((filmContainer.classList.contains(`all-movies`)) && (countRenderCardFilms < films.length)) {
     render(filmContainer, createButtonShowMoreTemplate(), `beforeend`);
-    // Вешаем обработичк на кнопку show-more
     filmContainer.querySelector(`.films-list__show-more`).addEventListener(`click`, () => {
       renderCardsFilms(filmContainer, films, FILM_COUNT);
     });
   }
 };
 
-// Отрисовка общего списка фильмов
+// Отрисовка карточек фильмов в 3-ех блоках
 const filmContainerHead = document.querySelector(`.films-list:nth-of-type(1) .films-list__container`);
 renderCardsFilms(filmContainerHead, films, FILM_COUNT);
-
-// Отрисовка колонки с фильмами ТОР
 const filmContainerTop = document.querySelector(`.films-list:nth-of-type(2) .films-list__container`);
 renderCardsFilms(filmContainerTop, films, FILM_TOP_COUNT);
-
-// Отрисовска колонки с фильмами MOST
 const filmContainerMost = document.querySelector(`.films-list:nth-of-type(3) .films-list__container`);
 renderCardsFilms(filmContainerMost, films, FILM_MOST_COUNT);
 
-/*
-  1. Вешаем обработчик на каждую картинку в карточке
-  2. Обработчик вызывает отрисовку popup.
-  3. При нажатии на крестик в попапе, он удаляется из разметки.
- */
+// Повесить обработчики на карточки
+createEventsForCardFilm();
 
-const footerContainer = document.querySelector(`footer`);
-document.querySelectorAll(`.film-card`).forEach((card) => {
-  // Вешаем обработчик на картинку
-  card.children[3].addEventListener(`click`, () => {
-    // Отрисовывем после футера попап, кототрый с помощью css правил перекрывает собой
-    // все отображение на страничке
-    // ...
-    // 1. Считать атрбиут ID.
-    const filmId = card.getAttribute(`data-id`).toString();
-    const clickFilm = searchFilmId(filmId);
-    const commentsFilm = searchCommentsFilmId(filmId);
-    // 2. Найти фильма с данный атрибутом. Сделать в виде отдельной функции.
-    // 3. Найти комментарии с данным атрибутом. Сделать в виде отдельной функции.
-    render(footerContainer, createFilmPopupTemplate(clickFilm, commentsFilm), `afterend`);
-    // Находим крестик в попап и вешаем на него обработчик, который
-    // находит попап в разметке и удаляет его
-    const filmPopupClose = document.querySelector(`.film-details__close-btn`);
-    filmPopupClose.addEventListener(`click`, () => {
-      const filmPopup = document.querySelector(`.film-details`);
-      filmPopup.parentElement.removeChild(filmPopup);
-    });
-  });
-});
 

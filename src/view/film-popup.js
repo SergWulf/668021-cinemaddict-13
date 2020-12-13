@@ -3,7 +3,7 @@ export const createFilmPopupTemplate = (film, comments) => {
   // Список сценаристов
   // Список актёров
   // Список комментариев
-  const titleGenres = film[`genres`].length > 1 ? `Genres` : `Genre`;
+  const titleGenres = film.genres.length > 1 ? `Genres` : `Genre`;
 
   // Функция отрисовки жанра
   const renderGenre = (genre) => {
@@ -12,33 +12,31 @@ export const createFilmPopupTemplate = (film, comments) => {
 
   // Функция отрисовки всех жанров
   const renderGenres = (genres) => {
-    const getGenres = [];
-    genres.forEach((genre) => {
-      getGenres.push(renderGenre(genre));
+    const getGenres = genres.map((genre) => {
+      return renderGenre(genre);
     });
     return getGenres.join(` `);
   };
 
-  const renderComment = (comment) => {
+  const renderComment = (currentComment) => {
     return `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="./images/emoji/${comment[`emotion`]}.png" width="55" height="55" alt="emoji-${comment[`emotion`]}">
+              <img src="./images/emoji/${currentComment.emotion}.png" width="55" height="55" alt="emoji-${currentComment[`emotion`]}">
             </span>
             <div>
-              <p class="film-details__comment-text">${comment[`description`]}</p>
+              <p class="film-details__comment-text">${currentComment.description}</p>
               <p class="film-details__comment-info">
-                <span class="film-details__comment-author">${comment[`author`]}</span>
-                <span class="film-details__comment-day">${comment[`createDate`]}</span>
+                <span class="film-details__comment-author">${currentComment.author}</span>
+                <span class="film-details__comment-day">${currentComment.createDate}</span>
                 <button class="film-details__comment-delete">Delete</button>
               </p>
             </div>
           </li>`;
   };
 
-  const renderComments = (comments) => {
-    const getComments = [];
-    comments.forEach((comment) => {
-      getComments.push(renderComment(comment));
+  const renderComments = (commentaries) => {
+    const getComments = commentaries.map((comment) => {
+      return renderComment(comment);
     });
     return getComments.join(` `);
   };
@@ -51,7 +49,7 @@ export const createFilmPopupTemplate = (film, comments) => {
       </div>
       <div class="film-details__info-wrap">
         <div class="film-details__poster">
-          <img class="film-details__poster-img" src="${film[`poster`]}" alt="${film[`poster`]}">
+          <img class="film-details__poster-img" src="${film.poster}" alt="${film.poster}">
 
           <p class="film-details__age">18+</p>
         </div>
@@ -59,48 +57,48 @@ export const createFilmPopupTemplate = (film, comments) => {
         <div class="film-details__info">
           <div class="film-details__info-head">
             <div class="film-details__title-wrap">
-              <h3 class="film-details__title">${film[`title`]}</h3>
-              <p class="film-details__title-original">Original: ${film[`title`]}</p>
+              <h3 class="film-details__title">${film.title}</h3>
+              <p class="film-details__title-original">Original: ${film.title}</p>
             </div>
 
             <div class="film-details__rating">
-              <p class="film-details__total-rating">${film[`rating`]}</p>
+              <p class="film-details__total-rating">${film.rating}</p>
             </div>
           </div>
 
           <table class="film-details__table">
             <tr class="film-details__row">
               <td class="film-details__term">Director</td>
-              <td class="film-details__cell">${film[`director`]}</td>
+              <td class="film-details__cell">${film.director}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${film[`screenwriters`].join(`, `)}</td>
+              <td class="film-details__cell">${film.screenwriters.join(`, `)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${film[`actors`].join(`, `)}</td>
+              <td class="film-details__cell">${film.actors.join(`, `)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${film[`release`]}</td>
+              <td class="film-details__cell">${film.release}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${film[`runtime`]}</td>
+              <td class="film-details__cell">${film.runtime}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
-              <td class="film-details__cell">${film[`countries`]}</td>
+              <td class="film-details__cell">${film.countries}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">${titleGenres}</td>
-              <td class="film-details__cell">${renderGenres(film[`genres`])}</td>
+              <td class="film-details__cell">${renderGenres(film.genres)}</td>
             </tr>
           </table>
 
           <p class="film-details__film-description">
-          ${film[`description`]}
+          ${film.description}
           </p>
         </div>
       </div>
