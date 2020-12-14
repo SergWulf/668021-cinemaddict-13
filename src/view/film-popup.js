@@ -1,21 +1,15 @@
 export const createFilmPopupTemplate = (film, comments) => {
-  // Тут нужна деструтуризация, чтобы сразу получить нужные данные
-  // Список сценаристов
-  // Список актёров
-  // Список комментариев
+
   const titleGenres = film.genres.length > 1 ? `Genres` : `Genre`;
 
-  // Функция отрисовки жанра
   const renderGenre = (genre) => {
     return `<span class="film-details__genre">${genre}</span>`;
   };
 
-  // Функция отрисовки всех жанров
   const renderGenres = (genres) => {
-    const getGenres = genres.map((genre) => {
+    return genres.map((genre) => {
       return renderGenre(genre);
-    });
-    return getGenres.join(` `);
+    }).join(` `);
   };
 
   const renderComment = (currentComment) => {
@@ -35,10 +29,9 @@ export const createFilmPopupTemplate = (film, comments) => {
   };
 
   const renderComments = (commentaries) => {
-    const getComments = commentaries.map((comment) => {
+    return commentaries.map((comment) => {
       return renderComment(comment);
-    });
-    return getComments.join(` `);
+    }).join(` `);
   };
 
   return `<section class="film-details">
