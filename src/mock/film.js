@@ -1,39 +1,6 @@
-// Функция задания уникального идентификатора фильму, взятая из демонстрации академии.
-const nanoid = (t = 21) => {
-  let e = ``;
-  let r = crypto.getRandomValues(new Uint8Array(t));
-  for (; t--;) {
-    let n = 63 & r[t];
-    let tempExpressionOne = n < 63 ? `_` : `-`;
-    let tempExpressionTwo = n < 62 ? (n - 26).toString(36).toUpperCase() : tempExpressionOne;
-    e += n < 36 ? n.toString(36) : tempExpressionTwo;
-  }
-  return e;
-};
+import {nanoid} from "../functions/nanoid.js";
+import {getRandomInteger, shuffle, generateRandomBoolean} from "../functions/random.js";
 
-// Функция возвращающая случайное значение из диапазона
-export const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-// Функция перемешивания массива, благополучно взятая из харбра, по совету, чтобы не изобретать велосипед :)
-const shuffle = (arr) => {
-  let j;
-  let temp;
-  for (let i = arr.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    temp = arr[j];
-    arr[j] = arr[i];
-    arr[i] = temp;
-  }
-  return arr;
-};
-
-
-// Текст для заполнения описания к фильмам.
 export const TEXT_TEMPLATE = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`;
 
 // Название фильмов
@@ -117,7 +84,7 @@ const generateDescription = () => {
 };
 
 const generateRating = () => {
-  return `${getRandomInteger(5, 9)}.${getRandomInteger(0, 9)}`;
+  return parseFloat(`${getRandomInteger(5, 9)}.${getRandomInteger(0, 9)}`);
 };
 
 const generateGenres = () => {
@@ -191,10 +158,6 @@ const generateCountries = () => {
   ];
 
   return shuffle(countries).slice(0, getRandomInteger(1, 3)).join(`, `);
-};
-
-const generateRandomBoolean = () => {
-  return Math.random() < 0.5;
 };
 
 export const generateFilm = () => {

@@ -7,9 +7,7 @@ export const createFilmPopupTemplate = (film, comments) => {
   };
 
   const renderGenres = (genres) => {
-    return genres.map((genre) => {
-      return renderGenre(genre);
-    }).join(` `);
+    return genres.map((genre) => renderGenre(genre)).join(` `);
   };
 
   const renderComment = (currentComment) => {
@@ -29,9 +27,7 @@ export const createFilmPopupTemplate = (film, comments) => {
   };
 
   const renderComments = (commentaries) => {
-    return commentaries.map((comment) => {
-      return renderComment(comment);
-    }).join(` `);
+    return commentaries.map((comment) => renderComment(comment)).join(` `);
   };
 
   return `<section class="film-details">

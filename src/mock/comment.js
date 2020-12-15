@@ -1,4 +1,4 @@
-import {getRandomInteger} from "./film.js";
+import {getRandomInteger} from "../functions/random.js";
 import {TEXT_TEMPLATE} from "./film.js";
 
 const generateEmotion = () => {
