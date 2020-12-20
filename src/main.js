@@ -1,4 +1,4 @@
-import {createHeaderProfileTemplate} from "./view/header-profile.js";
+import HeaderProfileTemplate from "./view/header-profile.js";
 import {createMainFilterTemplate} from "./view/main-filter.js";
 import {createMainSortTemplate} from "./view/main-sort.js";
 import {createMainContentTemplate} from "./view/main-content.js";
@@ -7,7 +7,7 @@ import {createButtonShowMoreTemplate} from "./view/film-more.js";
 import {createFilmPopupTemplate} from "./view/film-popup.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT, films, filmsTop, filmsMost, filters} from "./mock/data.js";
 import {findFilmById, findCommentsByFilmId} from "./functions/find.js";
-import {renderTemplate} from "./util.js";
+import {renderTemplate, renderElement, RenderPosition} from "./util.js";
 
 
 const siteHeader = document.querySelector(`.header`);
@@ -15,7 +15,7 @@ const siteMain = document.querySelector(`main`);
 const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 let renderedFilmCardsCount = 0;
 
-renderTemplate(siteHeader, createHeaderProfileTemplate(), `beforeend`);
+renderTemplate(siteHeader, new HeaderProfileTemplate().getElement(), RenderPosition.BEFOREEND);
 renderTemplate(siteMain, createMainFilterTemplate(filters), `beforeend`);
 renderTemplate(siteMain, createMainSortTemplate(), `beforeend`);
 renderTemplate(siteMain, createMainContentTemplate(), `beforeend`);
