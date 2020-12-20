@@ -7,6 +7,7 @@ import {createButtonShowMoreTemplate} from "./view/film-more.js";
 import {createFilmPopupTemplate} from "./view/film-popup.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT, films, filmsTop, filmsMost, filters} from "./mock/data.js";
 import {findFilmById, findCommentsByFilmId} from "./functions/find.js";
+import {renderTemplate} from "./util.js";
 
 
 const siteHeader = document.querySelector(`.header`);
@@ -14,20 +15,16 @@ const siteMain = document.querySelector(`main`);
 const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 let renderedFilmCardsCount = 0;
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
-
-render(siteHeader, createHeaderProfileTemplate(), `beforeend`);
-render(siteMain, createMainFilterTemplate(filters), `beforeend`);
-render(siteMain, createMainSortTemplate(), `beforeend`);
-render(siteMain, createMainContentTemplate(), `beforeend`);
+renderTemplate(siteHeader, createHeaderProfileTemplate(), `beforeend`);
+renderTemplate(siteMain, createMainFilterTemplate(filters), `beforeend`);
+renderTemplate(siteMain, createMainSortTemplate(), `beforeend`);
+renderTemplate(siteMain, createMainContentTemplate(), `beforeend`);
 
 const clickByCard = (filmId) => {
   const footerContainer = document.querySelector(`footer`);
   const clickFilm = findFilmById(filmId);
   const commentsFilm = findCommentsByFilmId(filmId);
-  render(footerContainer, createFilmPopupTemplate(clickFilm, commentsFilm), `afterend`);
+  renderTemplate(footerContainer, createFilmPopupTemplate(clickFilm, commentsFilm), `afterend`);
 
   const filmPopupClose = document.querySelector(`.film-details__close-btn`);
   filmPopupClose.addEventListener(`click`, () => {
@@ -42,7 +39,7 @@ const renderCardsFilms = (filmContainer, listFilms, count, renderedCount) => {
   }
   for (let i = renderedCount; i < (renderedCount + count); i++) {
     const countComments = findCommentsByFilmId(listFilms[i][`id`]).length;
-    render(filmContainer, createFilmCardTemplate(listFilms[i], countComments), `beforeend`);
+    renderTemplate(filmContainer, createFilmCardTemplate(listFilms[i], countComments), `beforeend`);
     const cards = filmContainer.querySelectorAll(`.film-card`);
     const card = cards[cards.length - 1];
     const currentFilmId = card.getAttribute(`data-id`).toString();
@@ -65,7 +62,7 @@ const renderCardsFilmsHead = (containerHead) => {
   // то рисуем кнопку show more, иначе кнопка не нужна
   renderedFilmCardsCount = containerHead.querySelectorAll(`.film-card`).length;
   if (renderedFilmCardsCount < films.length) {
-    render(containerHead, createButtonShowMoreTemplate(), `beforeend`);
+    renderTemplate(containerHead, createButtonShowMoreTemplate(), `beforeend`);
     containerHead.querySelector(`.films-list__show-more`).addEventListener(`click`, () => {
       renderCardsFilmsHead(containerHead);
     });
