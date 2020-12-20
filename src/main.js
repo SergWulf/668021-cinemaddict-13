@@ -1,9 +1,9 @@
-import HeaderProfileTemplate from "./view/header-profile.js";
-import {createMainFilterTemplate} from "./view/main-filter.js";
-import {createMainSortTemplate} from "./view/main-sort.js";
-import {createMainContentTemplate} from "./view/main-content.js";
-import {createFilmCardTemplate} from "./view/film-card.js";
-import {createButtonShowMoreTemplate} from "./view/film-more.js";
+import HeaderProfileView from "./view/header-profile.js";
+import MainFilterView from "./view/main-filter.js";
+import SortView from "./view/main-sort.js";
+import MainContainerView from "./view/main-content.js";
+import FilmCardView from "./view/film-card.js";
+import ButtonShowMoreView from "./view/film-more.js";
 import {createFilmPopupTemplate} from "./view/film-popup.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT, films, filmsTop, filmsMost, filters} from "./mock/data.js";
 import {findFilmById, findCommentsByFilmId} from "./functions/find.js";
@@ -15,10 +15,10 @@ const siteMain = document.querySelector(`main`);
 const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 let renderedFilmCardsCount = 0;
 
-renderTemplate(siteHeader, new HeaderProfileTemplate().getElement(), RenderPosition.BEFOREEND);
-renderTemplate(siteMain, createMainFilterTemplate(filters), `beforeend`);
-renderTemplate(siteMain, createMainSortTemplate(), `beforeend`);
-renderTemplate(siteMain, createMainContentTemplate(), `beforeend`);
+renderElement(siteHeader, new HeaderProfileView().getElement(), RenderPosition.BEFOREEND);
+renderElement(siteMain, new MainFilterView(filters).getElement(), RenderPosition.BEFOREEND);
+renderElement(siteMain, new SortView().getElement(), RenderPosition.BEFOREEND);
+renderElement(siteMain, new MainContainerView().getElement(), RenderPosition.BEFOREEND);
 
 const clickByCard = (filmId) => {
   const footerContainer = document.querySelector(`footer`);
@@ -39,7 +39,7 @@ const renderCardsFilms = (filmContainer, listFilms, count, renderedCount) => {
   }
   for (let i = renderedCount; i < (renderedCount + count); i++) {
     const countComments = findCommentsByFilmId(listFilms[i][`id`]).length;
-    renderTemplate(filmContainer, createFilmCardTemplate(listFilms[i], countComments), `beforeend`);
+    renderElement(filmContainer, new FilmCardView(listFilms[i], countComments).getElement(), RenderPosition.BEFOREEND);
     const cards = filmContainer.querySelectorAll(`.film-card`);
     const card = cards[cards.length - 1];
     const currentFilmId = card.getAttribute(`data-id`).toString();
@@ -62,7 +62,7 @@ const renderCardsFilmsHead = (containerHead) => {
   // то рисуем кнопку show more, иначе кнопка не нужна
   renderedFilmCardsCount = containerHead.querySelectorAll(`.film-card`).length;
   if (renderedFilmCardsCount < films.length) {
-    renderTemplate(containerHead, createButtonShowMoreTemplate(), `beforeend`);
+    renderElement(containerHead, new ButtonShowMoreView().getElement(), `beforeend`);
     containerHead.querySelector(`.films-list__show-more`).addEventListener(`click`, () => {
       renderCardsFilmsHead(containerHead);
     });
