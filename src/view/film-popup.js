@@ -1,4 +1,6 @@
-export const createFilmPopupTemplate = (film, comments) => {
+import {createElement} from "../util.js";
+
+const createFilmPopupTemplate = (film, comments) => {
 
   const titleGenres = film.genres.length > 1 ? `Genres` : `Genre`;
 
@@ -144,3 +146,27 @@ export const createFilmPopupTemplate = (film, comments) => {
   </form>
 </section>`;
 };
+
+export default class FilmPopup {
+  constructor(film, comments) {
+    this._film = film;
+    this._comments = comments;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmPopupTemplate(this._film, this._comments);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

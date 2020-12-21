@@ -2,12 +2,13 @@ import HeaderProfileView from "./view/header-profile.js";
 import MainFilterView from "./view/main-filter.js";
 import SortView from "./view/main-sort.js";
 import MainContainerView from "./view/main-content.js";
+import MainContainerNoFilmView from "./view/no-films.js";
 import FilmCardView from "./view/film-card.js";
 import ButtonShowMoreView from "./view/film-more.js";
-import {createFilmPopupTemplate} from "./view/film-popup.js";
+import FilmPopupView from "./view/film-popup.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT, films, filmsTop, filmsMost, filters} from "./mock/data.js";
 import {findFilmById, findCommentsByFilmId} from "./functions/find.js";
-import {renderTemplate, renderElement, RenderPosition} from "./util.js";
+import {render, RenderPosition} from "./util.js";
 
 
 const siteHeader = document.querySelector(`.header`);
@@ -15,21 +16,27 @@ const siteMain = document.querySelector(`main`);
 const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 let renderedFilmCardsCount = 0;
 
-renderElement(siteHeader, new HeaderProfileView().getElement(), RenderPosition.BEFOREEND);
-renderElement(siteMain, new MainFilterView(filters).getElement(), RenderPosition.BEFOREEND);
-renderElement(siteMain, new SortView().getElement(), RenderPosition.BEFOREEND);
-renderElement(siteMain, new MainContainerView().getElement(), RenderPosition.BEFOREEND);
+render(siteHeader, new HeaderProfileView().getElement(), RenderPosition.BEFOREEND);
+render(siteMain, new MainFilterView(filters).getElement(), RenderPosition.BEFOREEND);
+render(siteMain, new SortView().getElement(), RenderPosition.BEFOREEND);
+
+if ((films) && (films.length > 0)) {
+  render(siteMain, new MainContainerView().getElement(), RenderPosition.BEFOREEND);
+} else {
+  render(siteMain, new MainContainerNoFilmView().getElement(), RenderPosition.BEFOREEND);
+}
 
 const clickByCard = (filmId) => {
   const footerContainer = document.querySelector(`footer`);
   const clickFilm = findFilmById(filmId);
   const commentsFilm = findCommentsByFilmId(filmId);
-  renderTemplate(footerContainer, createFilmPopupTemplate(clickFilm, commentsFilm), `afterend`);
-
+  const filmPopup = new FilmPopupView(clickFilm, commentsFilm).getElement();
+  footerContainer.appendChild(filmPopup);
+  document.body.classList.add(`hide-overflow`);
   const filmPopupClose = document.querySelector(`.film-details__close-btn`);
   filmPopupClose.addEventListener(`click`, () => {
-    const filmPopup = document.querySelector(`.film-details`);
     filmPopup.parentElement.removeChild(filmPopup);
+    document.body.classList.remove(`hide-overflow`);
   });
 };
 
@@ -39,12 +46,11 @@ const renderCardsFilms = (filmContainer, listFilms, count, renderedCount) => {
   }
   for (let i = renderedCount; i < (renderedCount + count); i++) {
     const countComments = findCommentsByFilmId(listFilms[i][`id`]).length;
-    renderElement(filmContainer, new FilmCardView(listFilms[i], countComments).getElement(), RenderPosition.BEFOREEND);
-    const cards = filmContainer.querySelectorAll(`.film-card`);
-    const card = cards[cards.length - 1];
-    const currentFilmId = card.getAttribute(`data-id`).toString();
+    const filmCard = new FilmCardView(listFilms[i], countComments).getElement();
+    render(filmContainer, filmCard, RenderPosition.BEFOREEND);
+    const currentFilmId = filmCard.getAttribute(`data-id`).toString();
     clickableSelectorsCardByFilm.forEach((selector) => {
-      card.querySelector(selector).addEventListener(`click`, () => {
+      filmCard.querySelector(selector).addEventListener(`click`, () => {
         clickByCard(currentFilmId);
       });
     });
@@ -62,7 +68,7 @@ const renderCardsFilmsHead = (containerHead) => {
   // то рисуем кнопку show more, иначе кнопка не нужна
   renderedFilmCardsCount = containerHead.querySelectorAll(`.film-card`).length;
   if (renderedFilmCardsCount < films.length) {
-    renderElement(containerHead, new ButtonShowMoreView().getElement(), `beforeend`);
+    render(containerHead, new ButtonShowMoreView().getElement(), `beforeend`);
     containerHead.querySelector(`.films-list__show-more`).addEventListener(`click`, () => {
       renderCardsFilmsHead(containerHead);
     });
