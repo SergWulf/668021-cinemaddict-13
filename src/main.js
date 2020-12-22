@@ -8,7 +8,7 @@ import ButtonShowMoreView from "./view/film-more.js";
 import FilmPopupView from "./view/film-popup.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT, films, filmsTop, filmsMost, filters} from "./mock/data.js";
 import {findFilmById, findCommentsByFilmId} from "./functions/find.js";
-import {render, RenderPosition} from "./util.js";
+import {render, RenderPosition, ESCAPE} from "./util.js";
 
 
 const siteHeader = document.querySelector(`.header`);
@@ -37,6 +37,12 @@ const clickByCard = (filmId) => {
   filmPopupClose.addEventListener(`click`, () => {
     filmPopup.parentElement.removeChild(filmPopup);
     document.body.classList.remove(`hide-overflow`);
+  });
+  document.body.addEventListener(`keyup`, (evt) => {
+    if ((evt.key === ESCAPE) && (document.querySelector(`.film-details`))) {
+      filmPopup.parentElement.removeChild(filmPopup);
+      document.body.classList.remove(`hide-overflow`);
+    }
   });
 };
 

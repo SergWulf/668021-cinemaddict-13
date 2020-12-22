@@ -1,3 +1,5 @@
+export const ESCAPE = `Escape`;
+
 export const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`
