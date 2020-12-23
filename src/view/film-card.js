@@ -1,4 +1,4 @@
-import {createElement} from "../util.js";
+import AbstractView from "./abstract.js";
 
 const createFilmCardTemplate = (film, countComments) => {
   return `<article class="film-card" data-id="${film.id}">
@@ -21,26 +21,14 @@ const createFilmCardTemplate = (film, countComments) => {
 };
 
 
-export default class FilmCard {
+export default class FilmCard extends AbstractView {
   constructor(film, comments) {
+    super();
     this._film = film;
     this._comments = comments;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmCardTemplate(this._film, this._comments);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
