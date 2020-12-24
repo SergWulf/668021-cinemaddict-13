@@ -8,7 +8,8 @@ import ButtonShowMoreView from "./view/film-more.js";
 import FilmPopupView from "./view/film-popup.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT, films, filmsTop, filmsMost, filters} from "./mock/data.js";
 import {findFilmById, findCommentsByFilmId} from "./functions/find.js";
-import {render, RenderPosition, ESCAPE} from "./util.js";
+import {ESCAPE} from "./util.js";
+import {render, RenderPosition, append, remove} from "./functions/render";
 
 
 const siteHeader = document.querySelector(`.header`);
@@ -16,14 +17,14 @@ const siteMain = document.querySelector(`main`);
 const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 let renderedFilmCardsCount = 0;
 
-render(siteHeader, new HeaderProfileView().getElement(), RenderPosition.BEFOREEND);
-render(siteMain, new MainFilterView(filters).getElement(), RenderPosition.BEFOREEND);
-render(siteMain, new SortView().getElement(), RenderPosition.BEFOREEND);
+render(siteHeader, new HeaderProfileView(), RenderPosition.BEFOREEND);
+render(siteMain, new MainFilterView(filters), RenderPosition.BEFOREEND);
+render(siteMain, new SortView(), RenderPosition.BEFOREEND);
 
 if ((films) && (films.length > 0)) {
-  render(siteMain, new MainContainerView().getElement(), RenderPosition.BEFOREEND);
+  render(siteMain, new MainContainerView(), RenderPosition.BEFOREEND);
 } else {
-  render(siteMain, new MainContainerNoFilmView().getElement(), RenderPosition.BEFOREEND);
+  render(siteMain, new MainContainerNoFilmView(), RenderPosition.BEFOREEND);
 }
 
 const clickByCard = (filmId) => {
@@ -31,10 +32,10 @@ const clickByCard = (filmId) => {
   const clickFilm = findFilmById(filmId);
   const commentsFilm = findCommentsByFilmId(filmId);
   const filmPopup = new FilmPopupView(clickFilm, commentsFilm);
-  footerContainer.appendChild(filmPopup.getElement());
+  append(footerContainer, filmPopup);
   document.body.classList.add(`hide-overflow`);
   const deletePopup = () => {
-    filmPopup.getElement().parentElement.removeChild(filmPopup.getElement());
+    remove(filmPopup);
     document.body.classList.remove(`hide-overflow`);
   };
   filmPopup.setClickClosePopupHandler(deletePopup);
@@ -52,7 +53,7 @@ const renderCardsFilms = (filmContainer, listFilms, count, renderedCount) => {
   for (let i = renderedCount; i < (renderedCount + count); i++) {
     const countComments = findCommentsByFilmId(listFilms[i][`id`]).length;
     const filmCard = new FilmCardView(listFilms[i], countComments);
-    render(filmContainer, filmCard.getElement(), RenderPosition.BEFOREEND);
+    render(filmContainer, filmCard, RenderPosition.BEFOREEND);
     const currentFilmId = filmCard.getElement().getAttribute(`data-id`).toString();
     clickableSelectorsCardByFilm.forEach((selector) => {
       filmCard.setClickShowPopupHandler(clickByCard, selector, currentFilmId);
@@ -72,7 +73,7 @@ const renderCardsFilmsHead = (containerHead) => {
   renderedFilmCardsCount = containerHead.querySelectorAll(`.film-card`).length;
   if (renderedFilmCardsCount < films.length) {
     const buttonShowMore = new ButtonShowMoreView();
-    render(containerHead, buttonShowMore.getElement(), `beforeend`);
+    render(containerHead, buttonShowMore, RenderPosition.BEFOREEND);
     buttonShowMore.setClickHandler(renderCardsFilmsHead, containerHead);
   }
 };
