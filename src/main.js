@@ -54,27 +54,27 @@ const renderCardsFilms = (filmContainer, listFilms, count, renderedCount) => {
     const countComments = findCommentsByFilmId(listFilms[i][`id`]).length;
     const filmCard = new FilmCardView(listFilms[i], countComments);
     render(filmContainer, filmCard, RenderPosition.BEFOREEND);
-    const currentFilmId = filmCard.getElement().getAttribute(`data-id`).toString();
+    // const currentFilmId = filmCard.getElement().getAttribute(`data-id`).toString();
     clickableSelectorsCardByFilm.forEach((selector) => {
-      filmCard.setClickShowPopupHandler(clickByCard, selector, currentFilmId);
+      filmCard.setClickShowPopupHandler(clickByCard, selector);
     });
   }
 };
 
-const renderCardsFilmsHead = (containerHead) => {
+const renderCardsFilmsHead = () => {
   // Если есть кнопка в разметке, то удаляем ее.
-  const showMore = containerHead.querySelector(`.films-list__show-more`);
+  const showMore = filmContainerHead.querySelector(`.films-list__show-more`);
   if (showMore) {
     showMore.parentElement.removeChild(showMore);
   }
-  renderCardsFilms(containerHead, films, FILM_COUNT, renderedFilmCardsCount);
+  renderCardsFilms(filmContainerHead, films, FILM_COUNT, renderedFilmCardsCount);
   // Если количество отображенных фильмов меньше общего количества фильмов,
   // то рисуем кнопку show more, иначе кнопка не нужна
-  renderedFilmCardsCount = containerHead.querySelectorAll(`.film-card`).length;
+  renderedFilmCardsCount = filmContainerHead.querySelectorAll(`.film-card`).length;
   if (renderedFilmCardsCount < films.length) {
     const buttonShowMore = new ButtonShowMoreView();
-    render(containerHead, buttonShowMore, RenderPosition.BEFOREEND);
-    buttonShowMore.setClickHandler(renderCardsFilmsHead, containerHead);
+    render(filmContainerHead, buttonShowMore, RenderPosition.BEFOREEND);
+    buttonShowMore.setClickHandler(renderCardsFilmsHead);
   }
 };
 

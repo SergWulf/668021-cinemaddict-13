@@ -1,5 +1,6 @@
 import AbstractView from "./abstract.js";
 
+
 const createFilmCardTemplate = (film, countComments) => {
   return `<article class="film-card" data-id="${film.id}">
           <h3 class="film-card__title">${film.title}</h3>
@@ -35,12 +36,11 @@ export default class FilmCard extends AbstractView {
 
   _clickShowPopupHandler(evt) {
     evt.preventDefault();
-    this._callback.click(this._callback.filmId);
+    this._callback.click(this._film.id);
   }
 
-  setClickShowPopupHandler(callback, container, filmId) {
+  setClickShowPopupHandler(callback, container) {
     this._callback.click = callback;
-    this._callback.filmId = filmId;
     this.getElement().querySelector(container).addEventListener(`click`, this._clickShowPopupHandler);
   }
 }
