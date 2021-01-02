@@ -14,7 +14,6 @@ import {render, RenderPosition, append, remove} from "./functions/render";
 
 const siteHeader = document.querySelector(`.header`);
 const siteMain = document.querySelector(`main`);
-const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 let renderedFilmCardsCount = 0;
 
 render(siteHeader, new HeaderProfileView(), RenderPosition.BEFOREEND);
@@ -54,10 +53,7 @@ const renderCardsFilms = (filmContainer, listFilms, count, renderedCount) => {
     const countComments = findCommentsByFilmId(listFilms[i][`id`]).length;
     const filmCard = new FilmCardView(listFilms[i], countComments);
     render(filmContainer, filmCard, RenderPosition.BEFOREEND);
-    // const currentFilmId = filmCard.getElement().getAttribute(`data-id`).toString();
-    clickableSelectorsCardByFilm.forEach((selector) => {
-      filmCard.setClickShowPopupHandler(clickByCard, selector);
-    });
+    filmCard.setClickShowPopupHandler(clickByCard);
   }
 };
 

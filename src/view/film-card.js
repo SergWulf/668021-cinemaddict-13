@@ -1,5 +1,6 @@
 import AbstractView from "./abstract.js";
 
+const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 
 const createFilmCardTemplate = (film, countComments) => {
   return `<article class="film-card" data-id="${film.id}">
@@ -39,8 +40,10 @@ export default class FilmCard extends AbstractView {
     this._callback.click(this._film.id);
   }
 
-  setClickShowPopupHandler(callback, container) {
+  setClickShowPopupHandler(callback) {
     this._callback.click = callback;
-    this.getElement().querySelector(container).addEventListener(`click`, this._clickShowPopupHandler);
+    clickableSelectorsCardByFilm.forEach((selector) => {
+      this.getElement().querySelector(selector).addEventListener(`click`, this._clickShowPopupHandler);
+    });
   }
 }
