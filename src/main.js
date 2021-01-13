@@ -16,10 +16,13 @@ const siteHeader = document.querySelector(`.header`);
 const siteMain = document.querySelector(`main`);
 let renderedFilmCardsCount = 0;
 
+// Отрисовка шапки, фильтров и сортировки. //позже удалю коммент :)
 render(siteHeader, new HeaderProfileView(), RenderPosition.BEFOREEND);
 render(siteMain, new MainFilterView(filters), RenderPosition.BEFOREEND);
 render(siteMain, new SortView(), RenderPosition.BEFOREEND);
 
+
+// Отрисовка
 if ((films) && (films.length > 0)) {
   render(siteMain, new MainContainerView(), RenderPosition.BEFOREEND);
 } else {
