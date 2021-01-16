@@ -2,6 +2,9 @@ import HeaderProfileView from "./view/header-profile.js";
 import MainFilterView from "./view/main-filter.js";
 import SortView from "./view/main-sort.js";
 import MainContainerView from "./view/main-content.js";
+import HeadListFilmsView from "./view/head-films.js";
+import TopListFilmsView from "./view/top-films.js";
+import MostListFilmsView from "./view/most-films.js";
 import MainContainerNoFilmView from "./view/no-films.js";
 import FilmCardView from "./view/film-card.js";
 import ButtonShowMoreView from "./view/film-more.js";
@@ -21,12 +24,21 @@ render(siteHeader, new HeaderProfileView(), RenderPosition.BEFOREEND);
 render(siteMain, new MainFilterView(filters), RenderPosition.BEFOREEND);
 render(siteMain, new SortView(), RenderPosition.BEFOREEND);
 
+// PRESENTER LIST-FILM.js
+const mainContainerView = new MainContainerView();
+const filmContainerHead = new HeadListFilmsView();
+const filmContainerTop = new TopListFilmsView();
+const filmContainerMost = new MostListFilmsView();
 
-// Отрисовка
+render(siteMain, mainContainerView, RenderPosition.BEFOREEND);
+
+// Отрисовка пустой страницы, если фильмов нет, иначе отрисовка фильмов
 if ((films) && (films.length > 0)) {
-  render(siteMain, new MainContainerView(), RenderPosition.BEFOREEND);
+  render(mainContainerView, filmContainerHead, RenderPosition.BEFOREEND);
+  render(mainContainerView, filmContainerTop, RenderPosition.BEFOREEND);
+  render(mainContainerView, filmContainerMost, RenderPosition.BEFOREEND);
 } else {
-  render(siteMain, new MainContainerNoFilmView(), RenderPosition.BEFOREEND);
+  render(mainContainerView, new MainContainerNoFilmView(), RenderPosition.BEFOREEND);
 }
 
 const clickByCard = (filmId) => {
@@ -55,21 +67,21 @@ const renderCardsFilms = (filmContainer, listFilms, count, renderedCount) => {
   for (let i = renderedCount; i < (renderedCount + count); i++) {
     const countComments = findCommentsByFilmId(listFilms[i][`id`]).length;
     const filmCard = new FilmCardView(listFilms[i], countComments);
-    render(filmContainer, filmCard, RenderPosition.BEFOREEND);
+    render(filmContainer.getElement().querySelector(`.films-list__container`), filmCard, RenderPosition.BEFOREEND);
     filmCard.setClickShowPopupHandler(clickByCard);
   }
 };
 
 const renderCardsFilmsHead = () => {
   // Если есть кнопка в разметке, то удаляем ее.
-  const showMore = filmContainerHead.querySelector(`.films-list__show-more`);
+  const showMore = filmContainerHead.getElement().querySelector(`.films-list__show-more`);
   if (showMore) {
     showMore.parentElement.removeChild(showMore);
   }
   renderCardsFilms(filmContainerHead, films, FILM_COUNT, renderedFilmCardsCount);
   // Если количество отображенных фильмов меньше общего количества фильмов,
   // то рисуем кнопку show more, иначе кнопка не нужна
-  renderedFilmCardsCount = filmContainerHead.querySelectorAll(`.film-card`).length;
+  renderedFilmCardsCount = filmContainerHead.getElement().querySelectorAll(`.film-card`).length;
   if (renderedFilmCardsCount < films.length) {
     const buttonShowMore = new ButtonShowMoreView();
     render(filmContainerHead, buttonShowMore, RenderPosition.BEFOREEND);
@@ -86,9 +98,6 @@ const renderCardsFilmsMost = (containerMost) => {
 };
 
 // Отрисовка карточек фильмов в 3-ех блоках
-const filmContainerHead = document.querySelector(`.films-list:nth-of-type(1) .films-list__container`);
 renderCardsFilmsHead(filmContainerHead);
-const filmContainerTop = document.querySelector(`.films-list:nth-of-type(2) .films-list__container`);
 renderCardsFilmsTop(filmContainerTop);
-const filmContainerMost = document.querySelector(`.films-list:nth-of-type(3) .films-list__container`);
 renderCardsFilmsMost(filmContainerMost);
