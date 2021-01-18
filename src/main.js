@@ -29,6 +29,7 @@ const mainContainerView = new MainContainerView();
 const filmContainerHead = new HeadListFilmsView();
 const filmContainerTop = new TopListFilmsView();
 const filmContainerMost = new MostListFilmsView();
+const buttonShowMore = new ButtonShowMoreView();
 
 render(siteMain, mainContainerView, RenderPosition.BEFOREEND);
 
@@ -83,7 +84,6 @@ const renderCardsFilmsHead = () => {
   // то рисуем кнопку show more, иначе кнопка не нужна
   renderedFilmCardsCount = filmContainerHead.getElement().querySelectorAll(`.film-card`).length;
   if (renderedFilmCardsCount < films.length) {
-    const buttonShowMore = new ButtonShowMoreView();
     render(filmContainerHead, buttonShowMore, RenderPosition.BEFOREEND);
     buttonShowMore.setClickHandler(renderCardsFilmsHead);
   }
