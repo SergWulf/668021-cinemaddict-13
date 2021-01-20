@@ -1,7 +1,9 @@
-import FilmCardView from "./view/film-card.js";
-import FilmPopupView from "./view/film-popup.js";
+import FilmCardView from "../view/film-card.js";
+import FilmPopupView from "../view/film-popup.js";
+import {render, RenderPosition, append, remove} from "../functions/render";
+import {ESCAPE} from "../util.js";
 
-import {render, RenderPosition, append, remove} from "./functions/render";
+const footerContainer = document.querySelector(`footer`);
 
 export default class Film {
   constructor(filmContainer, film, filmComments) {
@@ -20,12 +22,21 @@ export default class Film {
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
   }
 
-  _handleFilmClick() {
-
-  }
 
   _handlePopupFilmClickClose() {
+    remove(this._filmPopupComponent);
+    document.body.classList.remove(`hide-overflow`);
+  }
 
+  _handleFilmClick() {
+    append(footerContainer, this._filmPopupComponent);
+    document.body.classList.add(`hide-overflow`);
+    this._filmPopupComponent.setClickClosePopupHandler(this._handlePopupFilmClickClose);
+    document.body.addEventListener(`keyup`, (evt) => {
+      if ((evt.key === ESCAPE) && (document.querySelector(`.film-details`))) {
+        this._handlePopupFilmClickClose();
+      }
+    });
   }
 
   _handleFavoriteClick() {

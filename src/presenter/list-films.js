@@ -1,14 +1,13 @@
-import MainContainerView from "./view/main-content.js";
-import MainContainerNoFilmView from "./view/no-films.js";
-import HeadListFilmsView from "./view/head-films.js";
-import TopListFilmsView from "./view/top-films.js";
-import MostListFilmsView from "./view/most-films.js";
-import FilmCardView from "./view/film-card.js";
-import ButtonShowMoreView from "./view/film-more.js";
-import FilmPresenter from "./view/film.js";
-import {findCommentsByFilmId} from "./functions/find.js";
-import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT, films, filmsTop, filmsMost, filters} from "./mock/data.js";
-import {render, RenderPosition, remove} from "./functions/render";
+import MainContainerView from "../view/main-content";
+import MainContainerNoFilmView from "../view/no-films.js";
+import HeadListFilmsView from "../view/head-films.js";
+import TopListFilmsView from "../view/top-films.js";
+import MostListFilmsView from "../view/most-films.js";
+import ButtonShowMoreView from "../view/film-more.js";
+import FilmPresenter from "../presenter/film.js";
+import {findCommentsByFilmId} from "../functions/find.js";
+import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
+import {render, RenderPosition, remove} from "../functions/render";
 
 let renderedFilmCardsCount = 0;
 
@@ -30,8 +29,6 @@ export default class FilmList {
     this._listFilms = listFilms.slice();
     this._listTopFilms = listTopFilms.slice();
     this._listMostFilms = listMostFilms.slice();
-    // Метод для инициализации (начала работы) модуля,
-    // малая часть текущей функции renderBoard в main.js
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
@@ -48,12 +45,7 @@ export default class FilmList {
     }
   }
 
-  _renderFilm(currentFilm) {
-
-  }
-
   _renderFilms(filmContainer, films, count, renderedCount) {
-    // Метод для рендеринга N-фильмов за раз
     if (films.length < (renderedCount + count)) {
       count = films.length;
     }
@@ -62,9 +54,6 @@ export default class FilmList {
       const filmContainerDiv = filmContainer.getElement().querySelector(`.films-list__container`);
       const filmPresenter = new FilmPresenter(filmContainerDiv, films[i], comments);
       filmPresenter.init();
-      // Presenter Film *******
-      filmCard.setClickShowPopupHandler(clickByCard);
-      //
     }
   }
 
@@ -86,7 +75,6 @@ export default class FilmList {
   }
 
   _renderLoadMoreButton() {
-    // Метод отрисовки кнопки
     render(this._filmHeadListComponent, this._loadMoreButtonComponent, RenderPosition.BEFOREEND);
     this._loadMoreButtonComponent.setClickHandler(this._handleLoadMoreButtonClick);
   }
@@ -97,8 +85,7 @@ export default class FilmList {
       render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
       render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
       render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);
-    }
-    else {
+    } else {
       this._renderNoFilms();
     }
 
