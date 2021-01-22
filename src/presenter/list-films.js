@@ -8,12 +8,15 @@ import FilmPresenter from "../presenter/film.js";
 import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
 import {render, RenderPosition, remove} from "../functions/render";
+import {updateItem} from "../util.js";
 
 let renderedFilmCardsCount = 0;
 
 export default class FilmList {
   constructor(filmListContainer) {
     this._filmListContainer = filmListContainer;
+
+    this._filmPresenter = {};
 
     this._filmListComponent = new MainContainerView();
     this._filmHeadListComponent = new HeadListFilmsView();
@@ -23,6 +26,8 @@ export default class FilmList {
     this._noFilmsComponent = new MainContainerNoFilmView();
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
+    this._handleFilmChange = this._handleFilmChange.bind(this);
+
   }
 
   init(listFilms, listTopFilms, listMostFilms) {
@@ -37,10 +42,17 @@ export default class FilmList {
     this._renderFilmsContainer();
   }
 
+
+  _handleFilmChange(updatedFilm) {
+    this._listFilms = updateItem(this._listFilms, updatedFilm);
+    this._filmPresenter[updatedFilm.id].init(updatedFilm);
+  }
+
+
   _handleLoadMoreButtonClick() {
     this._renderHeadFilms();
 
-    if (renderedFilmCardsCount < this._listFilms.length) {
+    if (renderedFilmCardsCount == this._listFilms.length) {
       remove(this._loadMoreButtonComponent);
     }
   }
@@ -52,8 +64,9 @@ export default class FilmList {
     for (let i = renderedCount; i < (renderedCount + count); i++) {
       const comments = findCommentsByFilmId(films[i][`id`]);
       const filmContainerDiv = filmContainer.getElement().querySelector(`.films-list__container`);
-      const filmPresenter = new FilmPresenter(filmContainerDiv, films[i], comments);
-      filmPresenter.init();
+      const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleFilmChange);
+      filmPresenter.init(films[i]);
+      this._filmPresenter[films[i].id] = filmPresenter;
     }
   }
 
