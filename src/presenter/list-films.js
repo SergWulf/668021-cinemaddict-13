@@ -11,12 +11,15 @@ import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
 import {render, RenderPosition, remove, replace} from "../functions/render";
 import {updateItem} from "../util.js";
 
-
-let renderedFilmCardsCount = 0;
-
 export default class FilmList {
-  constructor(filmListContainer) {
+  constructor(filmListContainer, listFilms, listTopFilms, listMostFilms) {
     this._filmListContainer = filmListContainer;
+    this._renderedFilmCardsCount = 0;
+
+    this._listDefaultFilms = listFilms.slice();
+    this._listHeadFilms = listFilms.slice();
+    this._listTopFilms = listTopFilms.slice();
+    this._listMostFilms = listMostFilms.slice();
 
     this._filmPresenter = {};
 
@@ -35,12 +38,7 @@ export default class FilmList {
     this._handleButtonSort = this._handleButtonSort.bind(this);
   }
 
-  init(listFilms, listTopFilms, listMostFilms) {
-    this._listDefaultFilms = listFilms.slice();
-    this._listHeadFilms = listFilms.slice();
-    this._listTopFilms = listTopFilms.slice();
-    this._listMostFilms = listMostFilms.slice();
-
+  init() {
     render(this._filmListComponent, this._sortComponent, RenderPosition.BEFOREEND);
     this._sortComponent.setClickButtonSortHandler(this._handleButtonSort);
 
@@ -80,8 +78,8 @@ export default class FilmList {
     this._renderFilms(this._filmHeadListComponentNew, this._listHeadFilms, FILM_COUNT, 0);
     replace(this._filmHeadListComponentNew, this._filmHeadListComponent);
     remove(this._filmHeadListComponent);
-    this._filmHeadListComponent = this._filmHeadListComponentNew;
     remove(this._loadMoreButtonComponent);
+    this._filmHeadListComponent = this._filmHeadListComponentNew;
     this._renderLoadMoreButton();
     // 4. Заменить DOM реальный на отсортированный DOM.
   }
@@ -96,27 +94,27 @@ export default class FilmList {
   _handleLoadMoreButtonClick() {
     this._renderHeadFilms();
 
-    if (renderedFilmCardsCount === this._listHeadFilms.length) {
+    if (this._renderedFilmCardsCount === this._listHeadFilms.length) {
       remove(this._loadMoreButtonComponent);
     }
   }
 
-  _renderFilms(filmContainer, renderedFilms, count, renderedCount) {
-    if (renderedFilms.length < (renderedCount + count)) {
-      count = renderedFilms.length;
+  _renderFilms(filmContainer, currentListFilms, count, renderedCount) {
+    if (currentListFilms.length < (renderedCount + count)) {
+      count = currentListFilms.length - renderedCount;
     }
     for (let i = renderedCount; i < (renderedCount + count); i++) {
-      const comments = findCommentsByFilmId(renderedFilms[i][`id`]);
+      const comments = findCommentsByFilmId(currentListFilms[i][`id`]);
       const filmContainerDiv = filmContainer.getElement().querySelector(`.films-list__container`);
       const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleFilmChange);
-      filmPresenter.init(renderedFilms[i]);
-      this._filmPresenter[renderedFilms[i].id] = filmPresenter;
+      filmPresenter.init(currentListFilms[i]);
+      this._filmPresenter[currentListFilms[i].id] = filmPresenter;
     }
   }
 
   _renderHeadFilms() {
-    this._renderFilms(this._filmHeadListComponent, this._listHeadFilms, FILM_COUNT, renderedFilmCardsCount);
-    renderedFilmCardsCount = this._filmHeadListComponent.getElement().querySelectorAll(`.film-card`).length;
+    this._renderFilms(this._filmHeadListComponent, this._listHeadFilms, FILM_COUNT, this._renderedFilmCardsCount);
+    this._renderedFilmCardsCount = this._filmHeadListComponent.getElement().querySelectorAll(`.film-card`).length;
   }
 
   _renderTopFilms() {
@@ -138,7 +136,7 @@ export default class FilmList {
 
   _renderFilmsContainer() {
     // Отображение всех контейнеров если есть хотя бы 1 фильм, иначе заглушка
-    if ((this._listHeadFilms) && (this._listHeadFilms.length > 0)) {
+    if (this._listHeadFilms.length > 0) {
       render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
       render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
       render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);

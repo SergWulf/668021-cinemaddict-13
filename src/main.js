@@ -10,5 +10,5 @@ const siteMain = document.querySelector(`main`);
 render(siteHeader, new HeaderProfileView(), RenderPosition.BEFOREEND);
 render(siteMain, new MainFilterView(filters), RenderPosition.BEFOREEND);
 
-const listFilmPresenter = new ListFilmPresenter(siteMain);
-listFilmPresenter.init(films, filmsTop, filmsMost);
+const listFilmPresenter = new ListFilmPresenter(siteMain, films, filmsTop, filmsMost);
+listFilmPresenter.init();
