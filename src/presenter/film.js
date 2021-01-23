@@ -50,40 +50,28 @@ export default class Film {
   }
 
   _handleFavoriteClick() {
-    this._changeData(Object.assign({}, this._film,{isFavorite: !this._film.isFavorite}));
-    // Если Favorite был false, то сделать его true
-    // Обновить данные в массиве данных
-    // Перерисовать Кнопку или Label (input) жёлтым цветом, т.е. добавить класс .film-details__watched-status--active
-    // Если Favorite был true, то также обновить массив, а затем убрать класс цвета).
+    this._changeData(Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}));
   }
 
   _handleWatchListClick() {
-    this._changeData(Object.assign({},
-      this._film,
-      {
-        isWatchList: !this._film.isWatchList
-      }));
+    this._changeData(Object.assign({}, this._film, {isWatchList: !this._film.isWatchList}));
   }
 
   _handleWatchedClick() {
-    this._changeData(Object.assign({},
-      this._film,
-      {
-        isWatched: !this._film.isWatched
-      }));
+    this._changeData(Object.assign({}, this._film, {isWatched: !this._film.isWatched}));
   }
 
   _setHandlers(filmComponent) {
-   filmComponent.setClickShowPopupHandler(this._handleFilmClick);
-   filmComponent.setClickButtonFavoriteHandler(this._handleFavoriteClick);
-   filmComponent.setClickButtonWatchedHandler(this._handleWatchedClick);
-   filmComponent.setClickButtonWatchListHandler(this._handleWatchListClick);
+    filmComponent.setClickShowPopupHandler(this._handleFilmClick);
+    filmComponent.setClickButtonFavoriteHandler(this._handleFavoriteClick);
+    filmComponent.setClickButtonWatchedHandler(this._handleWatchedClick);
+    filmComponent.setClickButtonWatchListHandler(this._handleWatchListClick);
   }
 
   init(film) {
     this._film = film;
 
-    if (this._filmComponent == null) {
+    if (this._filmComponent === null) {
       this._filmComponent = new FilmCardView(this._film, this._filmComments.length);
       render(this._filmContainer, this._filmComponent, RenderPosition.BEFOREEND);
       this._setHandlers(this._filmComponent);

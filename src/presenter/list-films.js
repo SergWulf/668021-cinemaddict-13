@@ -4,11 +4,13 @@ import HeadListFilmsView from "../view/head-films.js";
 import TopListFilmsView from "../view/top-films.js";
 import MostListFilmsView from "../view/most-films.js";
 import ButtonShowMoreView from "../view/film-more.js";
+import SortView from "../view/main-sort.js";
 import FilmPresenter from "../presenter/film.js";
 import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
-import {render, RenderPosition, remove} from "../functions/render";
+import {render, RenderPosition, remove, replace} from "../functions/render";
 import {updateItem} from "../util.js";
+
 
 let renderedFilmCardsCount = 0;
 
@@ -18,6 +20,8 @@ export default class FilmList {
 
     this._filmPresenter = {};
 
+    this._sortComponent = new SortView();
+
     this._filmListComponent = new MainContainerView();
     this._filmHeadListComponent = new HeadListFilmsView();
     this._filmTopListComponent = new TopListFilmsView();
@@ -25,15 +29,21 @@ export default class FilmList {
     this._loadMoreButtonComponent = new ButtonShowMoreView();
     this._noFilmsComponent = new MainContainerNoFilmView();
 
+
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleFilmChange = this._handleFilmChange.bind(this);
-
+    this._handleButtonSort = this._handleButtonSort.bind(this);
   }
 
   init(listFilms, listTopFilms, listMostFilms) {
-    this._listFilms = listFilms.slice();
+    this._listDefaultFilms = listFilms.slice();
+    this._listHeadFilms = listFilms.slice();
     this._listTopFilms = listTopFilms.slice();
     this._listMostFilms = listMostFilms.slice();
+
+    render(this._filmListComponent, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setClickButtonSortHandler(this._handleButtonSort);
+
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
@@ -42,36 +52,70 @@ export default class FilmList {
     this._renderFilmsContainer();
   }
 
+  _sortFilms(type) {
+    switch (type) {
+      case `default`:
+        this._listHeadFilms = this._listDefaultFilms.slice();
+        break;
+      case `rating`:
+        this._listHeadFilms = this._listDefaultFilms.slice().sort((prev, next) => {
+          return next.rating - prev.rating;
+        });
+        break;
+      case `date`:
+        this._listHeadFilms = this._listDefaultFilms.slice().sort((prev, next) => {
+          return next.release - prev.release;
+        });
+        break;
+      default:
+        this._listHeadFilms = this._listDefaultFilms.slice();
+    }
+  }
+
+  _handleButtonSort(typeSort) {
+    // 1. Определить тип сортировки при помощи атрибута
+    // 2. В зависимости от сортировки, применить необходимый метод сортировки.
+    this._sortFilms(typeSort);
+    this._filmHeadListComponentNew = new HeadListFilmsView();
+    this._renderFilms(this._filmHeadListComponentNew, this._listHeadFilms, FILM_COUNT, 0);
+    replace(this._filmHeadListComponentNew, this._filmHeadListComponent);
+    remove(this._filmHeadListComponent);
+    this._filmHeadListComponent = this._filmHeadListComponentNew;
+    remove(this._loadMoreButtonComponent);
+    this._renderLoadMoreButton();
+    // 4. Заменить DOM реальный на отсортированный DOM.
+  }
 
   _handleFilmChange(updatedFilm) {
-    this._listFilms = updateItem(this._listFilms, updatedFilm);
+    this._listHeadFilms = updateItem(this._listHeadFilms, updatedFilm);
     this._filmPresenter[updatedFilm.id].init(updatedFilm);
+    // Вызвать обработчик фильтров
   }
 
 
   _handleLoadMoreButtonClick() {
     this._renderHeadFilms();
 
-    if (renderedFilmCardsCount == this._listFilms.length) {
+    if (renderedFilmCardsCount === this._listHeadFilms.length) {
       remove(this._loadMoreButtonComponent);
     }
   }
 
-  _renderFilms(filmContainer, films, count, renderedCount) {
-    if (films.length < (renderedCount + count)) {
-      count = films.length;
+  _renderFilms(filmContainer, renderedFilms, count, renderedCount) {
+    if (renderedFilms.length < (renderedCount + count)) {
+      count = renderedFilms.length;
     }
     for (let i = renderedCount; i < (renderedCount + count); i++) {
-      const comments = findCommentsByFilmId(films[i][`id`]);
+      const comments = findCommentsByFilmId(renderedFilms[i][`id`]);
       const filmContainerDiv = filmContainer.getElement().querySelector(`.films-list__container`);
       const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleFilmChange);
-      filmPresenter.init(films[i]);
-      this._filmPresenter[films[i].id] = filmPresenter;
+      filmPresenter.init(renderedFilms[i]);
+      this._filmPresenter[renderedFilms[i].id] = filmPresenter;
     }
   }
 
   _renderHeadFilms() {
-    this._renderFilms(this._filmHeadListComponent, this._listFilms, FILM_COUNT, renderedFilmCardsCount);
+    this._renderFilms(this._filmHeadListComponent, this._listHeadFilms, FILM_COUNT, renderedFilmCardsCount);
     renderedFilmCardsCount = this._filmHeadListComponent.getElement().querySelectorAll(`.film-card`).length;
   }
 
@@ -94,7 +138,7 @@ export default class FilmList {
 
   _renderFilmsContainer() {
     // Отображение всех контейнеров если есть хотя бы 1 фильм, иначе заглушка
-    if ((this._listFilms) && (this._listFilms.length > 0)) {
+    if ((this._listHeadFilms) && (this._listHeadFilms.length > 0)) {
       render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
       render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
       render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);

@@ -174,18 +174,15 @@ export default class FilmPopup extends AbstractView {
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._clickClosePopupHandler);
   }
 
-  _clickLabelFavoriteHandler(evt) {
-    //evt.preventDefault();
+  _clickLabelFavoriteHandler() {
     this._callback.favoriteClick();
   }
 
-  _clickLabelWatchedHandler(evt) {
-    //evt.preventDefault();
+  _clickLabelWatchedHandler() {
     this._callback.watchedClick();
   }
 
-  _clickLabelWatchListHandler(evt) {
-    //evt.preventDefault();
+  _clickLabelWatchListHandler() {
     this._callback.watchListClick();
   }
 
