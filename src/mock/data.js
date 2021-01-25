@@ -11,7 +11,7 @@ export const films = [];
 export const comments = [];
 
 // Генерируем моки: фильмы и комментарии.
-for (let i = 0; i < 25; i++) {
+for (let i = 0; i < 27; i++) {
   films.push(generateFilm());
   // Генерируем кол-во комментарием к фильму от 0 до 5
   const commentCount = getRandomInteger(0, 6);
