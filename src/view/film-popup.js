@@ -1,9 +1,13 @@
-import AbstractView from "./abstract.js";
+import SmartView from "./smart.js";
 
-const createFilmPopupTemplate = (film, comments) => {
+const createFilmPopupTemplate = (film, comments, dataCurrentComment) => {
 
   const titleGenres = film.genres.length > 1 ? `Genres` : `Genre`;
   const activeStatus = `checked`;
+  let imgIcon = ``;
+  if (dataCurrentComment.icon) {
+    imgIcon = dataCurrentComment.icon.outerHTML;
+  }
 
   const renderGenre = (genre) => {
     return `<span class="film-details__genre">${genre}</span>`;
@@ -114,7 +118,7 @@ const createFilmPopupTemplate = (film, comments) => {
         <ul class="film-details__comments-list">${renderComments(comments)}</ul>
 
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">${imgIcon}</div>
 
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -148,20 +152,35 @@ const createFilmPopupTemplate = (film, comments) => {
 </section>`;
 };
 
-export default class FilmPopup extends AbstractView {
-  constructor(film, comments) {
+export default class FilmPopup extends SmartView {
+  constructor(film, comments, callbackRestoreHandlers) {
     super();
     this._film = film;
     this._comments = comments;
+    this._callback.renewHandlers = callbackRestoreHandlers;
 
     this._clickClosePopupHandler = this._clickClosePopupHandler.bind(this);
+
     this._clickLabelFavoriteHandler = this._clickLabelFavoriteHandler.bind(this);
     this._clickLabelWatchedHandler = this._clickLabelWatchedHandler.bind(this);
     this._clickLabelWatchListHandler = this._clickLabelWatchListHandler.bind(this);
+
+    this._clickLabelIconsHandler = this._clickLabelIconsHandler.bind(this);
+
+    this._renewHandlers = this._renewHandlers.bind(this);
   }
 
   getTemplate() {
-    return createFilmPopupTemplate(this._film, this._comments);
+    return createFilmPopupTemplate(this._film, this._comments, this._data);
+  }
+
+  restoreHandlers() {
+    this.getElement().scrollTop = this._data.scrollPosition;
+    this._renewHandlers();
+  }
+
+  _renewHandlers() {
+    this._callback.renewHandlers();
   }
 
   _clickClosePopupHandler(evt) {
@@ -186,6 +205,17 @@ export default class FilmPopup extends AbstractView {
     this._callback.watchListClick();
   }
 
+  _clickLabelIconsHandler(evt) {
+    const iconImg = evt.target.cloneNode(false);
+    iconImg.width = 70;
+    iconImg.height = 70;
+    this.updateData({
+      icon: iconImg,
+      scrollPosition: this.getElement().scrollTop
+    });
+    this._callback.iconsClick();
+  }
+
   setClickLabelFavoriteHandler(callback) {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._clickLabelWatchListHandler);
@@ -199,5 +229,12 @@ export default class FilmPopup extends AbstractView {
   setClickLabelWatchListHandler(callback) {
     this._callback.watchListClick = callback;
     this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._clickLabelFavoriteHandler);
+  }
+
+  setClickLabelIconsHandler(callback) {
+    this._callback.iconsClick = callback;
+    this.getElement().querySelectorAll(`.film-details__emoji-label`).forEach((labelIcon) => {
+      labelIcon.addEventListener(`click`, this._clickLabelIconsHandler);
+    });
   }
 }
