@@ -179,6 +179,28 @@ export default class FilmPopup extends SmartView {
     this._renewHandlers();
   }
 
+  setClickLabelFavoriteHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._clickLabelWatchListHandler);
+  }
+
+  setClickLabelWatchedHandler(callback) {
+    this._callback.watchedClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--watched`).addEventListener(`click`, this._clickLabelWatchedHandler);
+  }
+
+  setClickLabelWatchListHandler(callback) {
+    this._callback.watchListClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._clickLabelFavoriteHandler);
+  }
+
+  setClickLabelIconsHandler(callback) {
+    this._callback.iconsClick = callback;
+    this.getElement().querySelectorAll(`.film-details__emoji-label`).forEach((labelIcon) => {
+      labelIcon.addEventListener(`click`, this._clickLabelIconsHandler);
+    });
+  }
+
   _renewHandlers() {
     this._callback.renewHandlers();
   }
@@ -216,25 +238,4 @@ export default class FilmPopup extends SmartView {
     this._callback.iconsClick();
   }
 
-  setClickLabelFavoriteHandler(callback) {
-    this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._clickLabelWatchListHandler);
-  }
-
-  setClickLabelWatchedHandler(callback) {
-    this._callback.watchedClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--watched`).addEventListener(`click`, this._clickLabelWatchedHandler);
-  }
-
-  setClickLabelWatchListHandler(callback) {
-    this._callback.watchListClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._clickLabelFavoriteHandler);
-  }
-
-  setClickLabelIconsHandler(callback) {
-    this._callback.iconsClick = callback;
-    this.getElement().querySelectorAll(`.film-details__emoji-label`).forEach((labelIcon) => {
-      labelIcon.addEventListener(`click`, this._clickLabelIconsHandler);
-    });
-  }
 }

@@ -28,6 +28,16 @@ export default class Film {
     this._setFilmPopupHandlers = this._setFilmPopupHandlers.bind(this);
   }
 
+  init(film) {
+    this._film = film;
+
+    if (this._filmComponent === null) {
+      this._filmComponent = new FilmCardView(this._film, this._filmComments.length);
+      render(this._filmContainer, this._filmComponent, RenderPosition.BEFOREEND);
+      this._setFilmHandlers(this._filmComponent);
+    }
+  }
+
   _handleIconClick() {
 
   }
@@ -63,16 +73,20 @@ export default class Film {
     });
   }
 
+  _patchFilm(patch) {
+    this._changeData(Object.assign({}, this._film, patch));
+  }
+
   _handleFavoriteClick() {
-    this._changeData(Object.assign({}, this._film, {isFavorite: !this._film.isFavorite}));
+    this._patchFilm({isFavorite: !this._film.isFavorite});
   }
 
   _handleWatchListClick() {
-    this._changeData(Object.assign({}, this._film, {isWatchList: !this._film.isWatchList}));
+    this._patchFilm({isWatchList: !this._film.isWatchList});
   }
 
   _handleWatchedClick() {
-    this._changeData(Object.assign({}, this._film, {isWatched: !this._film.isWatched}));
+    this._patchFilm({isWatched: !this._film.isWatched});
   }
 
   _setFilmHandlers() {
@@ -80,16 +94,6 @@ export default class Film {
     this._filmComponent.setClickButtonFavoriteHandler(this._handleFavoriteClick);
     this._filmComponent.setClickButtonWatchedHandler(this._handleWatchedClick);
     this._filmComponent.setClickButtonWatchListHandler(this._handleWatchListClick);
-  }
-
-  init(film) {
-    this._film = film;
-
-    if (this._filmComponent === null) {
-      this._filmComponent = new FilmCardView(this._film, this._filmComments.length);
-      render(this._filmContainer, this._filmComponent, RenderPosition.BEFOREEND);
-      this._setFilmHandlers(this._filmComponent);
-    }
   }
 
 }
