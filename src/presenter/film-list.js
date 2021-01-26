@@ -12,7 +12,8 @@ import {render, RenderPosition, remove, replace} from "../functions/render";
 import {updateItem} from "../util.js";
 
 export default class FilmList {
-  constructor(filmListContainer, listFilms, listTopFilms, listMostFilms) {
+  constructor(filmListContainer, listFilms, listTopFilms, listMostFilms, filmsModel) {
+    this._filmsModel = filmsModel;
     this._filmListContainer = filmListContainer;
     this._renderedFilmCardsCount = 0;
 
@@ -48,6 +49,10 @@ export default class FilmList {
     render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);
 
     this._renderFilmsContainer();
+  }
+
+  _getFilms() {
+    return this._filmsModel.getFilms();
   }
 
   _sortFilms(type) {
