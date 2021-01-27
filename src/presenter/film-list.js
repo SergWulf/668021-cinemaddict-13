@@ -71,8 +71,6 @@ export default class FilmList {
   }
 
   _handleButtonSort(typeSort) {
-    // 1. Определить тип сортировки при помощи атрибута
-    // 2. В зависимости от сортировки, применить необходимый метод сортировки.
     this._sortFilms(typeSort);
     this._filmHeadListComponentNew = new HeadListFilmsView();
     this._renderFilms(this._filmHeadListComponentNew, this._listHeadFilms, FILM_COUNT, 0);
@@ -81,13 +79,11 @@ export default class FilmList {
     remove(this._loadMoreButtonComponent);
     this._filmHeadListComponent = this._filmHeadListComponentNew;
     this._renderLoadMoreButton();
-    // 4. Заменить DOM реальный на отсортированный DOM.
   }
 
   _handleFilmChange(updatedFilm) {
     this._listHeadFilms = updateItem(this._listHeadFilms, updatedFilm);
     this._filmPresenter[updatedFilm.id].init(updatedFilm);
-    // Вызвать обработчик фильтров
   }
 
 
