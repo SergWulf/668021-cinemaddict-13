@@ -1,15 +1,9 @@
+import {FilterType} from "./const.js";
 export const ESCAPE = `Escape`;
 
-export const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1)
-  ];
+export const filter = {
+  [FilterType.ALL]: (films) => films.filter((film) => film.id),
+  [FilterType.WATCHLIST]: (films) => films.filter((film) => film.isWatchList),
+  [FilterType.WATCHED]: (films) => films.filter((film) => film.isWatched),
+  [FilterType.FAVORITES]: (films) => films.filter((film) => film.isFavorite)
 };

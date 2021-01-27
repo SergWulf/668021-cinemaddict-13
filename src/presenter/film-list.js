@@ -8,30 +8,37 @@ import SortView from "../view/main-sort.js";
 import FilmPresenter from "../presenter/film.js";
 import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
-import {render, RenderPosition, remove, replace} from "../functions/render";
-import {updateItem} from "../util.js";
+import {render, RenderPosition, remove, replace} from "../functions/render.js";
+import {UserAction, UpdateType} from "../const.js"
+
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel) {
+  constructor(filmListContainer, filmsModel, commentsModel) {
     this._filmsModel = filmsModel;
+    this._commentsModel = commentsModel;
     this._filmListContainer = filmListContainer;
     this._renderedFilmCardsCount = 0;
 
     this._filmPresenter = {};
 
     this._sortComponent = new SortView();
+    this._loadMoreButtonComponent = new ButtonShowMoreView();
+
 
     this._filmListComponent = new MainContainerView();
     this._filmHeadListComponent = new HeadListFilmsView();
     this._filmTopListComponent = new TopListFilmsView();
     this._filmMostListComponent = new MostListFilmsView();
-    this._loadMoreButtonComponent = new ButtonShowMoreView();
+
     this._noFilmsComponent = new MainContainerNoFilmView();
 
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
-    this._handleFilmChange = this._handleFilmChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleButtonSort = this._handleButtonSort.bind(this);
+
+    this._filmsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -73,6 +80,7 @@ export default class FilmList {
 
   _handleButtonSort(typeSort) {
     this._filmHeadListComponentNew = new HeadListFilmsView();
+    // Пофиксить render
     this._renderFilms(this._filmHeadListComponentNew, this._sortFilms(typeSort), FILM_COUNT, 0);
     replace(this._filmHeadListComponentNew, this._filmHeadListComponent);
     remove(this._filmHeadListComponent);
@@ -81,9 +89,43 @@ export default class FilmList {
     this._renderLoadMoreButton();
   }
 
-  _handleFilmChange(updatedFilm) {
-    // this._listHeadFilms = updateItem(this._listHeadFilms, updatedFilm);
-    this._filmPresenter[updatedFilm.id].init(updatedFilm);
+  _handleViewAction(actionType, updateType, update) {
+    console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_FILM:
+        this._filmsModel.updateFilm(updateType, update);
+        break;
+      case UserAction.ADD_COMMENT:
+        this._commentsModel.addComment(updateType, update);
+        break;
+      case UserAction.DELETE_COMMENT:
+        this._commentsModel.deleteComment(updateType, update);
+        break;
+    }
+  }
+
+  _handleModelEvent(updateType, data) {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case UpdateType.PATCH:
+        // - обновить часть списка (например, когда поменялось описание)
+        this._filmPresenter[data.id].init(data);
+        break;
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        break;
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        break;
+    }
   }
 
 
@@ -95,7 +137,7 @@ export default class FilmList {
     for (let i = 0; i < currentListFilms.length; i++) {
       const comments = findCommentsByFilmId(currentListFilms[i][`id`]);
       const filmContainerDiv = filmContainer.getElement().querySelector(`.films-list__container`);
-      const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleFilmChange);
+      const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleViewAction);
       filmPresenter.init(currentListFilms[i]);
       this._filmPresenter[currentListFilms[i].id] = filmPresenter;
     }

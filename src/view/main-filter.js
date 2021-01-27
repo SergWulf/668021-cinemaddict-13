@@ -1,6 +1,6 @@
 import AbstractView from "./abstract.js";
 
-const createMainFilterTemplate = (filters) => {
+const createMainFilterTemplate = (filters, currentFilterType) => {
   const [watchList, history, favorites] = filters;
   return `<nav class="main-navigation">
     <div class="main-navigation__items">
@@ -14,12 +14,25 @@ const createMainFilterTemplate = (filters) => {
 };
 
 export default class Filter extends AbstractView {
-  constructor(filters) {
+  constructor(filters, currentFilterType) {
     super();
     this._filters = filters;
+    this._currentFilterType = currentFilterType;
+
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createMainFilterTemplate(this._filters);
+    return createMainFilterTemplate(this._filters, this._currentFilterType);
+  }
+
+  _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener(`change`, this._filterTypeChangeHandler);
   }
 }

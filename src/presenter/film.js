@@ -1,7 +1,8 @@
 import FilmCardView from "../view/film-card.js";
 import FilmPopupView from "../view/film-popup.js";
-import {render, replace, RenderPosition, append, remove} from "../functions/render";
+import {render, replace, RenderPosition, append, remove} from "../functions/render.js";
 import {ESCAPE} from "../util.js";
+import {UserAction, UpdateType} from "../const.js"
 
 const footerContainer = document.querySelector(`footer`);
 
@@ -34,7 +35,7 @@ export default class Film {
     if (this._filmComponent === null) {
       this._filmComponent = new FilmCardView(this._film, this._filmComments.length);
       render(this._filmContainer, this._filmComponent, RenderPosition.BEFOREEND);
-      this._setFilmHandlers(this._filmComponent);
+      this._setFilmHandlers();
     }
   }
 
@@ -74,7 +75,7 @@ export default class Film {
   }
 
   _patchFilm(patch) {
-    this._changeData(Object.assign({}, this._film, patch));
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, Object.assign({}, this._film, patch));
   }
 
   _handleFavoriteClick() {
