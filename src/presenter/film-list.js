@@ -9,13 +9,15 @@ import FilmPresenter from "../presenter/film.js";
 import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
 import {render, RenderPosition, remove, replace} from "../functions/render.js";
-import {UserAction, UpdateType} from "../const.js"
+import {UserAction, UpdateType, SortType, FilterType} from "../const.js"
+import {filter} from "../util.js";
 
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel, commentsModel) {
+  constructor(filmListContainer, filmsModel, commentsModel, filterModel) {
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
+    this._filterModel = filterModel;
     this._filmListContainer = filmListContainer;
     this._renderedFilmCardsCount = 0;
 
@@ -39,9 +41,15 @@ export default class FilmList {
     this._handleButtonSort = this._handleButtonSort.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
+
+    this._currentFilterType = this._filterModel.getFilter();
+    this._currentSortType = SortType.DEFAULT;
+    this._activeFilterFilms = null;
+
     render(this._filmListComponent, this._sortComponent, RenderPosition.BEFOREEND);
     this._sortComponent.setClickButtonSortHandler(this._handleButtonSort);
 
@@ -54,39 +62,96 @@ export default class FilmList {
   }
 
   _getFilms() {
-    return this._filmsModel.getFilms();
-  }
+    // глобальная функция
 
-  _sortFilms(type) {
-    switch (type) {
-      case `rating`:
-        return this._getFilms().slice().sort((prev, next) => {
+    switch(this._currentFilterType) {
+      case FilterType.ALL:
+        this._activeFilterFilms = filter[FilterType.ALL](this._filmsModel.getFilms());
+        break;
+      case FilterType.WATCHED:
+        this._activeFilterFilms = filter[FilterType.WATCHED](this._filmsModel.getFilms());
+        break;
+      case FilterType.WATCHLIST:
+        this._activeFilterFilms = filter[FilterType.WATCHLIST](this._filmsModel.getFilms());
+        break;
+      case FilterType.FAVORITES:
+        this._activeFilterFilms = filter[FilterType.FAVORITES](this._filmsModel.getFilms());
+        break;
+    }
+
+    switch (this._currentSortType) {
+      case SortType.RATING:
+        return this._activeFilterFilms.slice().sort((prev, next) => {
           return next.rating - prev.rating;
         });
-      case `date`:
-        return this._getFilms().slice().sort((prev, next) => {
+      case SortType.DATE:
+        return this._activeFilterFilms.slice().sort((prev, next) => {
           return next.release - prev.release;
         });
-      case `most`:
-        return this._getFilms().slice().map((filmMost) => {
+      case SortType.MOST:
+        return this._activeFilterFilms.slice().map((filmMost) => {
           filmMost.countComments = findCommentsByFilmId(filmMost.id).length;
           return filmMost;
         }).sort((prev, next) => {
           return next.countComments - prev.countComments;
         });
+      case SortType.DEFAULT:
+        return this._activeFilterFilms.slice();
     }
-    return this._getFilms().slice();
+
+
+
+    /*
+      1. Проверяет флаг активного фильтра, в зависимости от этого возвращает отфильтроанный массив.
+
+      2. Проверяет флаг активной сортировки, если сортировка default, то ничего не делаем, а возвращаем отфильтрованный массив.
+      3. Если сортировка по date или rating, то берём отфильтрованный массив и сортируем его, и возвращаем его.
+
+      P.S.
+      Не по теме:
+
+      Обработчик фильтра.
+      При нажатии на кнопку фильтра: устанавливается активный фильтр и подсвечивается в меню фильтров,
+       сбрасывается активная сортировка в default и также подсвечиваем в меню сортировки default,
+       происходит перерисовка фильмов.
+
+      Обработчик кнопки сортировки:
+      При нажатии на кнопку сортировки: устанавливаем активную сортировку, просиходит перерисовка фильмов.
+    * */
+   // return this._filmsModel.getFilms();
   }
 
-  _handleButtonSort(typeSort) {
+  _sortFilms(type) {
+    switch (type) {
+      case SortType.RATING:
+        this._currentSortType = SortType.RATING;
+        break;
+      case SortType.DATE:
+        this._currentSortType = SortType.DATE;
+        break;
+      case SortType.MOST:
+        this._currentSortType = SortType.MOST;
+        break;
+      case SortType.DEFAULT:
+        this._currentSortType = SortType.DEFAULT;
+    }
+  }
+
+  _replaceHeadContainer() {
     this._filmHeadListComponentNew = new HeadListFilmsView();
-    // Пофиксить render
-    this._renderFilms(this._filmHeadListComponentNew, this._sortFilms(typeSort), FILM_COUNT, 0);
+    const films = this._getFilms().slice(0, FILM_COUNT);
+    this._renderFilms(this._filmHeadListComponentNew, films);
     replace(this._filmHeadListComponentNew, this._filmHeadListComponent);
     remove(this._filmHeadListComponent);
     remove(this._loadMoreButtonComponent);
     this._filmHeadListComponent = this._filmHeadListComponentNew;
+    this._renderedFilmCardsCount = this._filmHeadListComponent.getElement().querySelectorAll(`.film-card`).length;
     this._renderLoadMoreButton();
+  }
+
+  _handleButtonSort(typeSort) {
+    this._sortFilms(typeSort);
+    this._replaceHeadContainer();
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -124,6 +189,8 @@ export default class FilmList {
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
+        this._currentFilterType = this._filterModel.getFilter();
+        this._replaceHeadContainer();
         break;
     }
   }
@@ -158,13 +225,25 @@ export default class FilmList {
   }
 
   _renderTopFilms() {
-    const films = this._sortFilms(`rating`).slice(0, FILM_TOP_COUNT);
+    const prevSortType = this._currentSortType;
+    const prevActiveFilter = this._currentFilterType;
+    this._currentSortType = SortType.RATING;
+    this._currentFilterType = FilterType.ALL;
+    const films = this._getFilms().slice(0, FILM_TOP_COUNT);
     this._renderFilms(this._filmTopListComponent, films);
+    this._currentSortType = prevSortType;
+    this._currentFilterType = prevActiveFilter;
   }
 
   _renderMostFilms() {
-    const films = this._sortFilms(`most`).slice(0, FILM_MOST_COUNT);
+    const prevSortType = this._currentSortType;
+    const prevActiveFilter = this._currentFilterType;
+    this._currentSortType = SortType.MOST;
+    this._currentFilterType = FilterType.ALL;
+    const films = this._getFilms().slice(0, FILM_MOST_COUNT);
     this._renderFilms(this._filmMostListComponent, films);
+    this._currentSortType = prevSortType;
+    this._currentFilterType = prevActiveFilter;
   }
 
   _renderNoFilms() {

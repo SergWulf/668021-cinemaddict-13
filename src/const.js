@@ -17,3 +17,10 @@ export const FilterType = {
   FAVORITES: `favorites`
 };
 
+export const SortType = {
+  DEFAULT: `default`,
+  DATE: `date`,
+  RATING: `rating`,
+  MOST: `most`
+}
+
