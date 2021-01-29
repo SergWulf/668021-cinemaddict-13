@@ -33,8 +33,8 @@ export default class Filter {
       return;
     }
 
-    //replace(this._filterComponent, prevFilterComponent);
-    //remove(prevFilterComponent);
+    replace(this._filterComponent, prevFilterComponent);
+    remove(prevFilterComponent);
   }
 
   _handleModelEvent() {

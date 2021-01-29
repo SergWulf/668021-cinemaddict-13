@@ -9,9 +9,8 @@ import FilmPresenter from "../presenter/film.js";
 import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
 import {render, RenderPosition, remove, replace} from "../functions/render.js";
-import {UserAction, UpdateType, SortType, FilterType} from "../const.js"
+import {UserAction, UpdateType, SortType, FilterType} from "../const.js";
 import {filter} from "../util.js";
-
 
 export default class FilmList {
   constructor(filmListContainer, filmsModel, commentsModel, filterModel) {
@@ -64,7 +63,7 @@ export default class FilmList {
   _getFilms() {
     // глобальная функция
 
-    switch(this._currentFilterType) {
+    switch (this._currentFilterType) {
       case FilterType.ALL:
         this._activeFilterFilms = filter[FilterType.ALL](this._filmsModel.getFilms());
         break;
@@ -98,9 +97,7 @@ export default class FilmList {
       case SortType.DEFAULT:
         return this._activeFilterFilms.slice();
     }
-
-
-
+    return this._filmsModel.getFilms();
     /*
       1. Проверяет флаг активного фильтра, в зависимости от этого возвращает отфильтроанный массив.
 
@@ -118,7 +115,6 @@ export default class FilmList {
       Обработчик кнопки сортировки:
       При нажатии на кнопку сортировки: устанавливаем активную сортировку, просиходит перерисовка фильмов.
     * */
-   // return this._filmsModel.getFilms();
   }
 
   _sortFilms(type) {
@@ -146,7 +142,9 @@ export default class FilmList {
     remove(this._loadMoreButtonComponent);
     this._filmHeadListComponent = this._filmHeadListComponentNew;
     this._renderedFilmCardsCount = this._filmHeadListComponent.getElement().querySelectorAll(`.film-card`).length;
-    this._renderLoadMoreButton();
+    if (this._getFilms().length > 5) {
+      this._renderLoadMoreButton();
+    }
   }
 
   _handleButtonSort(typeSort) {
@@ -155,7 +153,6 @@ export default class FilmList {
   }
 
   _handleViewAction(actionType, updateType, update) {
-    console.log(actionType, updateType, update);
     // Здесь будем вызывать обновление модели.
     // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
     // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
@@ -174,22 +171,25 @@ export default class FilmList {
   }
 
   _handleModelEvent(updateType, data) {
-    console.log(updateType, data);
     // В зависимости от типа изменений решаем, что делать:
     // - обновить часть списка (например, когда поменялось описание)
     // - обновить список (например, когда задача ушла в архив)
     // - обновить всю доску (например, при переключении фильтра)
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
+        // - обновить часть данные фильма
         this._filmPresenter[data.id].init(data);
         break;
       case UpdateType.MINOR:
         // - обновить список (например, когда задача ушла в архив)
+        this._filmPresenter[data.id].init(data);
+        this._replaceHeadContainer();
         break;
       case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)
         this._currentFilterType = this._filterModel.getFilter();
+        this._currentSortType = SortType.DEFAULT;
+        this._sortComponent.init();
         this._replaceHeadContainer();
         break;
     }
@@ -204,7 +204,7 @@ export default class FilmList {
     for (let i = 0; i < currentListFilms.length; i++) {
       const comments = findCommentsByFilmId(currentListFilms[i][`id`]);
       const filmContainerDiv = filmContainer.getElement().querySelector(`.films-list__container`);
-      const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleViewAction);
+      const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleViewAction, this._filterModel);
       filmPresenter.init(currentListFilms[i]);
       this._filmPresenter[currentListFilms[i].id] = filmPresenter;
     }
@@ -266,7 +266,9 @@ export default class FilmList {
     }
 
     this._renderHeadFilms();
-    this._renderLoadMoreButton();
+    if (this._getFilms().length > 5) {
+      this._renderLoadMoreButton();
+    }
     this._renderTopFilms();
     this._renderMostFilms();
   }

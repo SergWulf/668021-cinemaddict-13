@@ -17,15 +17,16 @@ export default class Sort extends AbstractView {
 
   }
 
-  _clickButtonSortHandler(evt) {
-    evt.preventDefault();
-    if (!evt.target.classList.contains(this._classActiveSortButton)) {
-      this._sortButtons.forEach((sortButton) => {
-        sortButton.classList.remove(this._classActiveSortButton);
-      });
-      evt.target.classList.add(this._classActiveSortButton);
-      this._callback.sortClick(evt.target.getAttribute(`data-sort`));
-    }
+  init() {
+    // как-то мудрёно получилось, потом поправлю
+    this._sortButtons.forEach((sortButton) => {
+      sortButton.classList.remove(this._classActiveSortButton);
+    });
+    this._sortButtons.forEach((sortButton) => {
+      if (sortButton.getAttribute(`data-sort`) === `default`) {
+        sortButton.classList.add(this._classActiveSortButton);
+      }
+    });
   }
 
   setClickButtonSortHandler(callback) {
@@ -38,4 +39,16 @@ export default class Sort extends AbstractView {
   getTemplate() {
     return createMainSortTemplate();
   }
+
+  _clickButtonSortHandler(evt) {
+    evt.preventDefault();
+    if (!evt.target.classList.contains(this._classActiveSortButton)) {
+      this._sortButtons.forEach((sortButton) => {
+        sortButton.classList.remove(this._classActiveSortButton);
+      });
+      evt.target.classList.add(this._classActiveSortButton);
+      this._callback.sortClick(evt.target.getAttribute(`data-sort`));
+    }
+  }
+
 }

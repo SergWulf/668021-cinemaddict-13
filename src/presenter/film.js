@@ -2,14 +2,15 @@ import FilmCardView from "../view/film-card.js";
 import FilmPopupView from "../view/film-popup.js";
 import {render, replace, RenderPosition, append, remove} from "../functions/render.js";
 import {ESCAPE} from "../util.js";
-import {UserAction, UpdateType} from "../const.js"
+import {UserAction, UpdateType} from "../const.js";
+import {FilterType} from "../const";
 
 const footerContainer = document.querySelector(`footer`);
 
 export default class Film {
-  constructor(filmContainer, filmComments, changeData) {
+  constructor(filmContainer, filmComments, changeData, filterModel) {
     this._filmContainer = filmContainer;
-
+    this._filterModel = filterModel;
     this._filmComments = filmComments;
 
     this._filmComponent = null;
@@ -74,20 +75,30 @@ export default class Film {
     });
   }
 
-  _patchFilm(patch) {
+  _patchFilm(patch, cardFilter) {
+    // Здесь нужно проверить: если на карточке/попапе нажата отмена фильтра(wh, wd, fv), и в данный момент
+    // список отфильтрован по тому фильтру, который убирается, то нужно удалить карточку
+    // 1. Найти ее и удалить.
+    // 2. Дорисовать
+
+    if (cardFilter === this._filterModel.getFilter()) {
+      this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, Object.assign({}, this._film, patch));
+    }
+
     this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, Object.assign({}, this._film, patch));
+
   }
 
   _handleFavoriteClick() {
-    this._patchFilm({isFavorite: !this._film.isFavorite});
+    this._patchFilm({isFavorite: !this._film.isFavorite}, FilterType.FAVORITES);
   }
 
   _handleWatchListClick() {
-    this._patchFilm({isWatchList: !this._film.isWatchList});
+    this._patchFilm({isWatchList: !this._film.isWatchList}, FilterType.WATCHLIST);
   }
 
   _handleWatchedClick() {
-    this._patchFilm({isWatched: !this._film.isWatched});
+    this._patchFilm({isWatched: !this._film.isWatched}, FilterType.WATCHED);
   }
 
   _setFilmHandlers() {
