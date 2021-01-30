@@ -1,4 +1,5 @@
 import SmartView from "./smart.js";
+import {nanoid} from "../functions/nanoid";
 
 const createFilmPopupTemplate = (film, comments, dataCurrentComment) => {
 
@@ -27,7 +28,7 @@ const createFilmPopupTemplate = (film, comments, dataCurrentComment) => {
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${currentComment.author}</span>
                 <span class="film-details__comment-day">${currentComment.createDate}</span>
-                <button class="film-details__comment-delete">Delete</button>
+                <button class="film-details__comment-delete" data-comment="${currentComment.id}">Delete</button>
               </p>
             </div>
           </li>`;
@@ -160,6 +161,7 @@ export default class FilmPopup extends SmartView {
     this._callback.renewHandlers = callbackRestoreHandlers;
 
     this._clickClosePopupHandler = this._clickClosePopupHandler.bind(this);
+    this._clickCtrlEnterPopupHandler = this._clickCtrlEnterPopupHandler.bind(this);
 
     this._clickLabelFavoriteHandler = this._clickLabelFavoriteHandler.bind(this);
     this._clickLabelWatchedHandler = this._clickLabelWatchedHandler.bind(this);
@@ -167,10 +169,18 @@ export default class FilmPopup extends SmartView {
 
     this._clickLabelIconsHandler = this._clickLabelIconsHandler.bind(this);
 
+    this._clickButtonDeleteComment = this._clickButtonDeleteComment.bind(this);
+
     this._renewHandlers = this._renewHandlers.bind(this);
   }
 
+  init(newComments) {
+    console.log(`Обновили комменты для отрисовки попапа`);
+    this._comments = newComments;
+  }
+
   getTemplate() {
+    console.log(this._data);
     return createFilmPopupTemplate(this._film, this._comments, this._data);
   }
 
@@ -201,8 +211,34 @@ export default class FilmPopup extends SmartView {
     });
   }
 
+  setClickButtonDeleteHandler(callback) {
+    this._callback.deleteCommentClick = callback;
+    this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((deleteButtonComment) => {
+      deleteButtonComment.addEventListener(`click`, this._clickButtonDeleteComment);
+    });
+  }
+
+  setClickClosePopupHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._clickClosePopupHandler);
+  }
+
+  setClickCtrlEnterPopupHandler(callback) {
+    this._callback.ctrlEnterClick = callback;
+    document.addEventListener(`keydown`, this._clickCtrlEnterPopupHandler);
+  }
+
   _renewHandlers() {
     this._callback.renewHandlers();
+  }
+
+  _clickButtonDeleteComment(evt) {
+    evt.preventDefault();
+    console.log(`Нажали на кнопку удалить коммент в попапе, передаем id коммента`);
+    this.updateData({
+      scrollPosition: this.getElement().scrollTop
+    }, true);
+    this._callback.deleteCommentClick(evt.target.getAttribute(`data-comment`));
   }
 
   _clickClosePopupHandler(evt) {
@@ -210,10 +246,28 @@ export default class FilmPopup extends SmartView {
     this._callback.click();
   }
 
-  setClickClosePopupHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._clickClosePopupHandler);
+  _clickCtrlEnterPopupHandler(evt) {
+    if ((evt.ctrlKey) && (evt.key === `Enter`)) {
+      const currentDescription = this.getElement().querySelector(`.film-details__comment-input`).value;
+      alert(currentDescription);
+      if ((this._data.emotion) && (currentDescription.length !== 0)) {
+        this.updateData({
+          scrollPosition: this.getElement().scrollTop
+        }, true);
+      this._callback.ctrlEnterClick({
+          id: nanoid(),
+          filmId: this._film.id,
+          description: currentDescription,
+          emotion: this._data.emotion,
+          author: `Movie Buff`,
+          createDate: `26/11/2020`
+      });
+      }
+    }
   }
+
+
+
 
   _clickLabelFavoriteHandler() {
     this._callback.favoriteClick();
@@ -233,6 +287,7 @@ export default class FilmPopup extends SmartView {
     iconImg.height = 70;
     this.updateData({
       icon: iconImg,
+      emotion: iconImg.src.split(`/`).pop().split(`.`).shift(),
       scrollPosition: this.getElement().scrollTop
     });
     this._callback.iconsClick();

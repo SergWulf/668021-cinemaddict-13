@@ -23,5 +23,10 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(siteMain, filterModel, filmsModel);
 const listFilmPresenter = new ListFilmPresenter(siteMain, filmsModel, commentsModel, filterModel);
 
+const footerStatistics = document.querySelector(`.footer__statistics`);
+const countFilms = document.createElement(`p`);
+countFilms.textContent = `${filmsModel.getFilms().length} movies inside`;
+footerStatistics.appendChild(countFilms);
+
 filterPresenter.init();
 listFilmPresenter.init();

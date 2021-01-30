@@ -8,10 +8,10 @@ import {FilterType} from "../const";
 const footerContainer = document.querySelector(`footer`);
 
 export default class Film {
-  constructor(filmContainer, filmComments, changeData, filterModel) {
+  constructor(filmContainer, commentsModel, changeData, filterModel) {
     this._filmContainer = filmContainer;
     this._filterModel = filterModel;
-    this._filmComments = filmComments;
+    this._commentsModel = commentsModel;
 
     this._filmComponent = null;
     this._filmPopupComponent = null;
@@ -22,6 +22,8 @@ export default class Film {
 
     this._handlePopupFilmClickClose = this._handlePopupFilmClickClose.bind(this);
     this._handleIconClick = this._handleIconClick.bind(this);
+    this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
+    this._handleCtrlEnterClick = this._handleCtrlEnterClick.bind(this);
 
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleWatchListClick = this._handleWatchListClick.bind(this);
@@ -31,8 +33,21 @@ export default class Film {
   }
 
   init(film) {
-    this._film = film;
-
+    if (film) {
+      this._film = film;
+    } else {
+      console.log(`Идёт инициализация в презентере фильма, попап не должен быть null`, this);
+    }
+    this._filmComments = this._commentsModel.getComments().filter((comment) => {
+      return comment.filmId === this._film.id;
+    });
+    if (this._filmPopupComponent !== null) {
+      console.log(`Попап существует, сейчас попробуем обновить комменты для его отрисовки`);
+      this._filmPopupComponent.init(this._filmComments);
+      console.log(`Начинаем перерисовывать попап`);
+      this._filmPopupComponent.updateElement();
+      console.log(`Ура, все перерисовалось!`);
+    }
     if (this._filmComponent === null) {
       this._filmComponent = new FilmCardView(this._film, this._filmComments.length);
       render(this._filmContainer, this._filmComponent, RenderPosition.BEFOREEND);
@@ -40,11 +55,27 @@ export default class Film {
     }
   }
 
+  replacePopupComponent() {
+
+  }
+
   _handleIconClick() {
 
   }
 
+  _handleCtrlEnterClick(dataComment) {
+    this._changeData(UserAction.ADD_COMMENT, UpdateType.ADD, dataComment);
+  }
+
+  _handleDeleteCommentClick(commentId) {
+    const removeComment = this._filmComments.find((comment) => {
+      return comment.id === commentId;
+    });
+    this._changeData(UserAction.DELETE_COMMENT, UpdateType.DELETE, removeComment);
+  }
+
   _handlePopupFilmClickClose() {
+    console.log('Этого сообщения не должно быть видно!')
     remove(this._filmPopupComponent);
     document.body.classList.remove(`hide-overflow`);
     this._filmComponentNew = new FilmCardView(this._film, this._filmComments.length);
@@ -59,6 +90,8 @@ export default class Film {
     this._filmPopupComponent.setClickLabelWatchedHandler(this._handleWatchedClick);
     this._filmPopupComponent.setClickLabelWatchListHandler(this._handleWatchListClick);
     this._filmPopupComponent.setClickLabelIconsHandler(this._handleIconClick);
+    this._filmPopupComponent.setClickButtonDeleteHandler(this._handleDeleteCommentClick);
+    this._filmPopupComponent.setClickCtrlEnterPopupHandler(this._handleCtrlEnterClick);
   }
 
   _handleFilmClick() {
@@ -73,20 +106,15 @@ export default class Film {
         this._handlePopupFilmClickClose();
       }
     });
+    console.log(`Попап появился и уже не должен пропадать!`, this);
   }
 
   _patchFilm(patch, cardFilter) {
-    // Здесь нужно проверить: если на карточке/попапе нажата отмена фильтра(wh, wd, fv), и в данный момент
-    // список отфильтрован по тому фильтру, который убирается, то нужно удалить карточку
-    // 1. Найти ее и удалить.
-    // 2. Дорисовать
-
     if (cardFilter === this._filterModel.getFilter()) {
       this._changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, Object.assign({}, this._film, patch));
     }
 
     this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, Object.assign({}, this._film, patch));
-
   }
 
   _handleFavoriteClick() {

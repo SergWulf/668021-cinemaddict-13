@@ -41,6 +41,7 @@ export default class FilmList {
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -54,8 +55,8 @@ export default class FilmList {
 
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
-    render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
-    render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);
+/*    render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
+    render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);*/
 
     this._renderFilmsContainer();
   }
@@ -165,6 +166,7 @@ export default class FilmList {
         this._commentsModel.addComment(updateType, update);
         break;
       case UserAction.DELETE_COMMENT:
+        console.log(`Сейчас начинаем удалять коммент из модели`);
         this._commentsModel.deleteComment(updateType, update);
         break;
     }
@@ -172,9 +174,9 @@ export default class FilmList {
 
   _handleModelEvent(updateType, data) {
     // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+    // - обновить данные
+    // - обновить данные и перерисовать список фильмов
+    // - обновить данные фильтра и перерисовать список фильмов
     switch (updateType) {
       case UpdateType.PATCH:
         // - обновить часть данные фильма
@@ -192,6 +194,14 @@ export default class FilmList {
         this._sortComponent.init();
         this._replaceHeadContainer();
         break;
+      case UpdateType.DELETE:
+        console.log(`Ждём обновления комменнтов для попапа`);
+        this._filmPresenter[data.filmId].init();
+        //this._filmPresenter[data.filmId].replacePopupComponent();
+        //this._replaceHeadContainer();
+        break;
+      case UpdateType.ADD:
+        this._filmPresenter[data.filmId].init();
     }
   }
 
@@ -202,9 +212,8 @@ export default class FilmList {
 
   _renderFilms(filmContainer, currentListFilms) {
     for (let i = 0; i < currentListFilms.length; i++) {
-      const comments = findCommentsByFilmId(currentListFilms[i][`id`]);
       const filmContainerDiv = filmContainer.getElement().querySelector(`.films-list__container`);
-      const filmPresenter = new FilmPresenter(filmContainerDiv, comments, this._handleViewAction, this._filterModel);
+      const filmPresenter = new FilmPresenter(filmContainerDiv, this._commentsModel, this._handleViewAction, this._filterModel);
       filmPresenter.init(currentListFilms[i]);
       this._filmPresenter[currentListFilms[i].id] = filmPresenter;
     }
@@ -259,8 +268,8 @@ export default class FilmList {
     // Отображение всех контейнеров если есть хотя бы 1 фильм, иначе заглушка
     if (this._getFilms().length > 0) {
       render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
-      render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
-      render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);
+/*      render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
+      render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);*/
     } else {
       this._renderNoFilms();
     }
@@ -269,7 +278,8 @@ export default class FilmList {
     if (this._getFilms().length > 5) {
       this._renderLoadMoreButton();
     }
-    this._renderTopFilms();
-    this._renderMostFilms();
+
+/*    this._renderTopFilms();
+    this._renderMostFilms();*/
   }
 }

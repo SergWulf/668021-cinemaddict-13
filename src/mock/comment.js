@@ -1,3 +1,4 @@
+import {nanoid} from "../functions/nanoid.js";
 import {getRandomInteger} from "../functions/random.js";
 import {TEXT_TEMPLATE} from "./film.js";
 
@@ -38,6 +39,7 @@ const generateReview = () => {
 
 export const generateComment = (id) => {
   return {
+    id: nanoid(),
     filmId: id,
     description: generateReview(),
     emotion: generateEmotion(),

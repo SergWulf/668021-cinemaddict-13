@@ -7,7 +7,9 @@ export const UserAction = {
 export const UpdateType = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  DELETE: `DELETE`,
+  ADD: `ADD`
 };
 
 export const FilterType = {
