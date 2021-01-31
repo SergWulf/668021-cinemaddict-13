@@ -8,10 +8,13 @@ import {FilterType} from "../const";
 const footerContainer = document.querySelector(`footer`);
 
 export default class Film {
-  constructor(filmContainer, commentsModel, changeData, filterModel) {
+  constructor(filmContainer, commentsModel, changeData, filterModel, setOpenPopup, checkOpenPopup) {
     this._filmContainer = filmContainer;
     this._filterModel = filterModel;
     this._commentsModel = commentsModel;
+
+    this._setOpenPopup = setOpenPopup;
+    this._checkOpenPopup = checkOpenPopup;
 
     this._filmComponent = null;
     this._filmPopupComponent = null;
@@ -35,19 +38,10 @@ export default class Film {
   init(film) {
     if (film) {
       this._film = film;
-    } else {
-      console.log(`Идёт инициализация в презентере фильма, попап не должен быть null`, this);
     }
     this._filmComments = this._commentsModel.getComments().filter((comment) => {
       return comment.filmId === this._film.id;
     });
-    if (this._filmPopupComponent !== null) {
-      console.log(`Попап существует, сейчас попробуем обновить комменты для его отрисовки`);
-      this._filmPopupComponent.init(this._filmComments);
-      console.log(`Начинаем перерисовывать попап`);
-      this._filmPopupComponent.updateElement();
-      console.log(`Ура, все перерисовалось!`);
-    }
     if (this._filmComponent === null) {
       this._filmComponent = new FilmCardView(this._film, this._filmComments.length);
       render(this._filmContainer, this._filmComponent, RenderPosition.BEFOREEND);
@@ -56,7 +50,10 @@ export default class Film {
   }
 
   replacePopupComponent() {
-
+    if (this._filmPopupComponent !== null) {
+      this._filmPopupComponent.init(this._filmComments);
+      this._filmPopupComponent.updateElement();
+    }
   }
 
   _handleIconClick() {
@@ -75,7 +72,7 @@ export default class Film {
   }
 
   _handlePopupFilmClickClose() {
-    console.log('Этого сообщения не должно быть видно!')
+    this._setOpenPopup(this._filmPopupComponent);
     remove(this._filmPopupComponent);
     document.body.classList.remove(`hide-overflow`);
     this._filmComponentNew = new FilmCardView(this._film, this._filmComments.length);
@@ -94,8 +91,17 @@ export default class Film {
     this._filmPopupComponent.setClickCtrlEnterPopupHandler(this._handleCtrlEnterClick);
   }
 
+  /*  Добавьте в презентер метод для скрытия попапа.
+    Передайте в презентер фильма колбэк, который нужно вызвать перед тем, как скрыть попап.
+    В презентере списка фильмов реализуйте метод для этого колбэка, который скроет попап, если таковой уже открыт.
+     Логика:
+     1. Когда нажимаем на карточку фильма, то нужно проверить, открыт ли какой-нибудь попап. Как узнать о нём?
+     2. Если попап открыт, то удалить его, и запустить уже другой попап.*/
+
   _handleFilmClick() {
+    this._checkOpenPopup();
     this._filmPopupComponent = new FilmPopupView(this._film, this._filmComments, this._setFilmPopupHandlers);
+    this._setOpenPopup(this._filmPopupComponent);
     append(footerContainer, this._filmPopupComponent);
     document.body.classList.add(`hide-overflow`);
 
@@ -106,7 +112,6 @@ export default class Film {
         this._handlePopupFilmClickClose();
       }
     });
-    console.log(`Попап появился и уже не должен пропадать!`, this);
   }
 
   _patchFilm(patch, cardFilter) {

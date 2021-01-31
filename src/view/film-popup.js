@@ -175,12 +175,10 @@ export default class FilmPopup extends SmartView {
   }
 
   init(newComments) {
-    console.log(`Обновили комменты для отрисовки попапа`);
     this._comments = newComments;
   }
 
   getTemplate() {
-    console.log(this._data);
     return createFilmPopupTemplate(this._film, this._comments, this._data);
   }
 
@@ -234,7 +232,6 @@ export default class FilmPopup extends SmartView {
 
   _clickButtonDeleteComment(evt) {
     evt.preventDefault();
-    console.log(`Нажали на кнопку удалить коммент в попапе, передаем id коммента`);
     this.updateData({
       scrollPosition: this.getElement().scrollTop
     }, true);
@@ -249,25 +246,21 @@ export default class FilmPopup extends SmartView {
   _clickCtrlEnterPopupHandler(evt) {
     if ((evt.ctrlKey) && (evt.key === `Enter`)) {
       const currentDescription = this.getElement().querySelector(`.film-details__comment-input`).value;
-      alert(currentDescription);
       if ((this._data.emotion) && (currentDescription.length !== 0)) {
         this.updateData({
           scrollPosition: this.getElement().scrollTop
         }, true);
-      this._callback.ctrlEnterClick({
+        this._callback.ctrlEnterClick({
           id: nanoid(),
           filmId: this._film.id,
           description: currentDescription,
           emotion: this._data.emotion,
           author: `Movie Buff`,
           createDate: `26/11/2020`
-      });
+        });
       }
     }
   }
-
-
-
 
   _clickLabelFavoriteHandler() {
     this._callback.favoriteClick();
