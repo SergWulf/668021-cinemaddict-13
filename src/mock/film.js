@@ -74,6 +74,7 @@ const generatePoster = () => {
     `./images/posters/the-dance-of-life.jpg`,
     `./images/posters/the-great-flamarion.jpg`,
     `./images/posters/the-man-with-the-golden-arm.jpg`,
+    `./images/posters/santa-claus-conquers-the-martians.jpg`
   ];
   return pathsPosters[getRandomInteger(0, pathsPosters.length - 1)];
 };

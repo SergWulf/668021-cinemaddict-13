@@ -5,6 +5,7 @@ import TopListFilmsView from "../view/top-films.js";
 import MostListFilmsView from "../view/most-films.js";
 import ButtonShowMoreView from "../view/film-more.js";
 import SortView from "../view/main-sort.js";
+import LoadingView from "../view/loading.js";
 import FilmPresenter from "../presenter/film.js";
 import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
@@ -13,16 +14,20 @@ import {UserAction, UpdateType, SortType, FilterType} from "../const.js";
 import {filter} from "../util.js";
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel, commentsModel, filterModel) {
+  constructor(filmListContainer, filmsModel, commentsModel, filterModel, api) {
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
     this._filterModel = filterModel;
     this._filmListContainer = filmListContainer;
     this._renderedFilmCardsCount = 0;
+    this._api = api;
+
+    this._isLoading = true;
 
     this._filmPresenter = {};
     this._openPopup = null;
 
+    this._loadingComponent = new LoadingView();
     this._sortComponent = new SortView();
     this._loadMoreButtonComponent = new ButtonShowMoreView();
 
@@ -180,7 +185,9 @@ export default class FilmList {
     // update - обновленные данные
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilm(updateType, response);
+        });
         break;
       case UserAction.ADD_COMMENT:
         this._commentsModel.addComment(updateType, update);
@@ -220,6 +227,11 @@ export default class FilmList {
       case UpdateType.ADD:
         this._filmPresenter[data.filmId].init();
         this._filmPresenter[data.filmId].replacePopupComponent();
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderFilmsContainer();
+        break;
     }
   }
 
@@ -288,8 +300,17 @@ export default class FilmList {
     this._loadMoreButtonComponent.setClickHandler(this._handleLoadMoreButtonClick);
   }
 
+  _renderLoading() {
+    render(this._filmListComponent, this._loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
   _renderFilmsContainer() {
     // Отображение всех контейнеров если есть хотя бы 1 фильм, иначе заглушка
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     if (this._getFilms().length > 0) {
       render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
       /*      render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);

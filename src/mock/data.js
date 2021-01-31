@@ -27,7 +27,7 @@ export const filmsTop = films.slice().sort((prev, next) => {
   return next.rating - prev.rating;
 });
 
-export let filmsMost = films.slice();
+/*export let filmsMost = films.slice();
 
 filmsMost.forEach((filmMost) => {
   filmMost.countComments = findCommentsByFilmId(filmMost.id).length;
@@ -35,7 +35,7 @@ filmsMost.forEach((filmMost) => {
 
 filmsMost = filmsMost.sort((prev, next) => {
   return next.countComments - prev.countComments;
-});
+});*/
 
 // Генерируем фильтры для фильмов
 export const filters = generateFilter(films);

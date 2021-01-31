@@ -9,7 +9,8 @@ export const UpdateType = {
   MINOR: `MINOR`,
   MAJOR: `MAJOR`,
   DELETE: `DELETE`,
-  ADD: `ADD`
+  ADD: `ADD`,
+  INIT: `INIT`
 };
 
 export const FilterType = {
