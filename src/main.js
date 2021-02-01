@@ -1,5 +1,5 @@
 import HeaderProfileView from "./view/header-profile.js";
-import {comments} from "./mock/data.js";
+// import {comments} from "./mock/data.js";
 import ListFilmPresenter from "./presenter/film-list.js";
 import {render, RenderPosition} from "./functions/render.js";
 import FilmsModel from "./model/films.js";
@@ -24,7 +24,7 @@ render(siteHeader, new HeaderProfileView(), RenderPosition.BEFOREEND);
 const filmsModel = new FilmsModel();
 
 const commentsModel = new CommentsModel();
-//commentsModel.setComments(comments);
+// commentsModel.setComments(comments);
 
 const filterModel = new FilterModel();
 
@@ -36,7 +36,7 @@ listFilmPresenter.init();
 
 api.getFilms()
   .then((films) => {
-/*    const commentsToModel = [];
+    /*    const commentsToModel = [];
     for(let i = 0; i < films.length; i++) {
       api.getComments(films[i])
         .then(comments => {
@@ -55,9 +55,5 @@ api.getFilms()
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);
   });
-
-
-
-
 
 

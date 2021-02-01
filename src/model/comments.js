@@ -42,12 +42,12 @@ export default class Comments extends Observer {
 
   static adaptToClient(comment) {
     const adaptedComment = Object.assign({},
-      comment,
-      {
+        comment,
+        {
         // "filmId": filmId,
-        "description": comment.comment,
-        "createDate": comment.date
-      });
+          "description": comment.comment,
+          "createDate": comment.date
+        });
     delete adaptedComment.comment;
     delete adaptedComment.date;
     return adaptedComment;

@@ -39,7 +39,7 @@ export default class Film {
     if (film) {
       this._film = film;
     }
-/*    this._filmComments = this._commentsModel.getComments().filter((comment) => {
+    /*    this._filmComments = this._commentsModel.getComments().filter((comment) => {
       return comment.filmId === this._film.id;
     });*/
     if (this._filmComponent === null) {

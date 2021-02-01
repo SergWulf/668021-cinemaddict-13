@@ -1,5 +1,4 @@
 import Observer from "../functions/observer.js";
-import {generateRandomBoolean} from "../functions/random";
 
 export default class Films extends Observer {
   constructor() {
@@ -74,16 +73,17 @@ export default class Films extends Observer {
   static adaptToServer(film) {
 
     const adaptedFilm = Object.assign(
-      {},
-      window.filmsFromServer[film.id],
-      {
-        "user_details": {
-          "watchlist": film.isWatchList,
-          "already_watched": film.isWatched,
-          "favorite": film.isFavorite,
-          "watching_date": null
+        {},
+        window.filmsFromServer[film.id],
+        {
+          "user_details": {
+            "watchlist": film.isWatchList,
+            "already_watched": film.isWatched,
+            "favorite": film.isFavorite,
+            "watching_date": null
+          }
         }
-      });
+    );
 
     return adaptedFilm;
   }

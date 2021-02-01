@@ -1,16 +1,25 @@
 import AbstractView from "./abstract.js";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
 
 const clickableSelectorsCardByFilm = [`.film-card__poster`, `.film-card__title`, `.film-card__comments`];
 const classActiveStatus = `film-card__controls-item--active`;
 
 const createFilmCardTemplate = (film, countComments) => {
 
+  const runtimeToHourAndMinutes = (filmRuntime) => {
+    const hourRuntime = Math.floor(filmRuntime / 60);
+    const minutesRuntime = filmRuntime % 60;
+    return `${hourRuntime}h ${minutesRuntime}m`;
+  };
+
   return `<article class="film-card" data-id="${film.id}">
           <h3 class="film-card__title">${film.title}</h3>
           <p class="film-card__rating">${film.rating}</p>
           <p class="film-card__info">
-            <span class="film-card__year">${film.release}</span>
-            <span class="film-card__duration">${film.runtime}</span>
+            <span class="film-card__year">${dayjs(film.release).format(`YYYY`)}</span>
+            <span class="film-card__duration">${runtimeToHourAndMinutes(parseInt(film.runtime, 10))}</span>
             <span class="film-card__genre">${film.genres[0]}</span>
           </p>
           <img src="${film.poster}" alt="" class="film-card__poster">

@@ -11,7 +11,7 @@ import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
 import {render, RenderPosition, remove, replace} from "../functions/render.js";
 import {UserAction, UpdateType, SortType, FilterType} from "../const.js";
-import {filter} from "../util.js";
+import {FILTER} from "../util.js";
 
 export default class FilmList {
   constructor(filmListContainer, filmsModel, commentsModel, filterModel, api) {
@@ -91,16 +91,16 @@ export default class FilmList {
 
     switch (this._currentFilterType) {
       case FilterType.ALL:
-        this._activeFilterFilms = filter[FilterType.ALL](this._filmsModel.getFilms());
+        this._activeFilterFilms = FILTER[FilterType.ALL](this._filmsModel.getFilms());
         break;
       case FilterType.WATCHED:
-        this._activeFilterFilms = filter[FilterType.WATCHED](this._filmsModel.getFilms());
+        this._activeFilterFilms = FILTER[FilterType.WATCHED](this._filmsModel.getFilms());
         break;
       case FilterType.WATCHLIST:
-        this._activeFilterFilms = filter[FilterType.WATCHLIST](this._filmsModel.getFilms());
+        this._activeFilterFilms = FILTER[FilterType.WATCHLIST](this._filmsModel.getFilms());
         break;
       case FilterType.FAVORITES:
-        this._activeFilterFilms = filter[FilterType.FAVORITES](this._filmsModel.getFilms());
+        this._activeFilterFilms = FILTER[FilterType.FAVORITES](this._filmsModel.getFilms());
         break;
     }
 

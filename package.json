@@ -19,5 +19,10 @@
   "engines": {
     "node": "10"
   },
-  "dependencies": {}
+  "dependencies": {
+    "chart.js": "2.9.4",
+    "chartjs-plugin-datalabels": "0.7.0",
+    "dayjs": "1.9.5",
+    "he": "1.2.0"
+  }
 }

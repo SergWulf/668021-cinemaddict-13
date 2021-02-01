@@ -1,4 +1,4 @@
-import FilmsModel from "./model/films.js"
+import FilmsModel from "./model/films.js";
 import CommentsModel from "./model/comments.js";
 
 const Method = {

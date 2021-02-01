@@ -2,7 +2,7 @@ import {generateFilm} from "./film.js";
 import {generateComment} from "./comment.js";
 import {generateFilter} from "./filter.js";
 import {getRandomInteger} from "../functions/random.js";
-import {findCommentsByFilmId} from "../functions/find.js";
+// import {findCommentsByFilmId} from "../functions/find.js";
 
 export const FILM_COUNT = 5;
 export const FILM_TOP_COUNT = 2;
@@ -27,7 +27,7 @@ export const filmsTop = films.slice().sort((prev, next) => {
   return next.rating - prev.rating;
 });
 
-/*export let filmsMost = films.slice();
+/* export let filmsMost = films.slice();
 
 filmsMost.forEach((filmMost) => {
   filmMost.countComments = findCommentsByFilmId(filmMost.id).length;
