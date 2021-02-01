@@ -227,6 +227,7 @@ export default class FilmList {
       case UpdateType.ADD:
         this._filmPresenter[data.filmId].init();
         this._filmPresenter[data.filmId].replacePopupComponent();
+        break;
       case UpdateType.INIT:
         this._isLoading = false;
         remove(this._loadingComponent);
