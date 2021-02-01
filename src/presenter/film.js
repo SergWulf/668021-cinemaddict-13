@@ -39,11 +39,11 @@ export default class Film {
     if (film) {
       this._film = film;
     }
-    this._filmComments = this._commentsModel.getComments().filter((comment) => {
+/*    this._filmComments = this._commentsModel.getComments().filter((comment) => {
       return comment.filmId === this._film.id;
-    });
+    });*/
     if (this._filmComponent === null) {
-      this._filmComponent = new FilmCardView(this._film, this._filmComments.length);
+      this._filmComponent = new FilmCardView(this._film, film.countComments);
       render(this._filmContainer, this._filmComponent, RenderPosition.BEFOREEND);
       this._setFilmHandlers();
     }
@@ -90,13 +90,6 @@ export default class Film {
     this._filmPopupComponent.setClickButtonDeleteHandler(this._handleDeleteCommentClick);
     this._filmPopupComponent.setClickCtrlEnterPopupHandler(this._handleCtrlEnterClick);
   }
-
-  /*  Добавьте в презентер метод для скрытия попапа.
-    Передайте в презентер фильма колбэк, который нужно вызвать перед тем, как скрыть попап.
-    В презентере списка фильмов реализуйте метод для этого колбэка, который скроет попап, если таковой уже открыт.
-     Логика:
-     1. Когда нажимаем на карточку фильма, то нужно проверить, открыт ли какой-нибудь попап. Как узнать о нём?
-     2. Если попап открыт, то удалить его, и запустить уже другой попап.*/
 
   _handleFilmClick() {
     this._checkOpenPopup();

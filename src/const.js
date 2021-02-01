@@ -10,7 +10,8 @@ export const UpdateType = {
   MAJOR: `MAJOR`,
   DELETE: `DELETE`,
   ADD: `ADD`,
-  INIT: `INIT`
+  INIT: `INIT`,
+  INIT_COMMENTS: `INIT_COMMENTS`
 };
 
 export const FilterType = {

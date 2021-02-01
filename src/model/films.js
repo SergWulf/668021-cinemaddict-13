@@ -34,7 +34,9 @@ export default class Films extends Observer {
   }
 
   static adaptToClient(film) {
-    console.log(JSON.stringify(film));
+
+    window.filmsFromServer.push(film);
+
     const adaptedFilm = Object.assign({},
         film,
         {
@@ -53,7 +55,8 @@ export default class Films extends Observer {
           "ageRating": `+${film.film_info.age_rating}`,
           "isWatchList": film.user_details.watchlist,
           "isWatched": film.user_details.already_watched,
-          "isFavorite": film.user_details.favorite
+          "isFavorite": film.user_details.favorite,
+          "countComments": film.comments.length
         }
     );
 
@@ -62,7 +65,6 @@ export default class Films extends Observer {
     delete adaptedFilm.film_info;
     delete adaptedFilm.dueDate;
     delete adaptedFilm.isArchive;
-    delete adaptedFilm.isFavorite;
     delete adaptedFilm.repeating;
     delete adaptedFilm.user_details;
 
@@ -70,42 +72,19 @@ export default class Films extends Observer {
   }
 
   static adaptToServer(film) {
-    // Нужно преобразовать poster и AgeRating
-    /* const release = Object.assign({},
-        {
-          "release_country": film.countries,
-          "date": film.release
-        });
-
-    const filmInfo = Object.assign({}, {
-      "release": release,
-      "poster": film.poster,
-      "title": film.title,
-      "alternative_title": film.originalTitle,
-      "total_rating": film.rating,
-      "director": film.director,
-      "writers": film.screenwriters,
-      "actors": film.actors,
-      "runtime": film.runtime,
-      "genre": film.genres,
-      "description": film.description,
-      "age_rating": film.ageRating,
-    });*/
-
-    const userDetails = Object.assign({}, {
-      "watchlist": film.isWatchList,
-      "already_watched": film.isWatched,
-      "favorite": film.isFavorite,
-      "watching_date": `2020-11-16T09:30:24.478Z`
-    });
 
     const adaptedFilm = Object.assign(
-        {},
-        {},
-        {
-          "user_details": userDetails
-        });
-    console.log(JSON.stringify(adaptedFilm));
+      {},
+      window.filmsFromServer[film.id],
+      {
+        "user_details": {
+          "watchlist": film.isWatchList,
+          "already_watched": film.isWatched,
+          "favorite": film.isFavorite,
+          "watching_date": null
+        }
+      });
+
     return adaptedFilm;
   }
 }

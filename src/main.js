@@ -9,6 +9,7 @@ import FilterPresenter from "./presenter/filter.js";
 import Api from "./api.js";
 import {UpdateType} from "./const.js";
 
+window.filmsFromServer = [];
 
 const AUTHORIZATION = `Basic TwentyOneToLoadBomb`;
 const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
@@ -23,7 +24,7 @@ render(siteHeader, new HeaderProfileView(), RenderPosition.BEFOREEND);
 const filmsModel = new FilmsModel();
 
 const commentsModel = new CommentsModel();
-commentsModel.setComments(comments);
+//commentsModel.setComments(comments);
 
 const filterModel = new FilterModel();
 
@@ -35,6 +36,16 @@ listFilmPresenter.init();
 
 api.getFilms()
   .then((films) => {
+/*    const commentsToModel = [];
+    for(let i = 0; i < films.length; i++) {
+      api.getComments(films[i])
+        .then(comments => {
+          comments.map((comment) => {
+            comment.filmId = films[i].id;
+            commentsToModel.push(comment);
+          });
+        });
+    }*/
     filmsModel.setFilms(UpdateType.INIT, films);
     const footerStatistics = document.querySelector(`.footer__statistics`);
     const countFilms = document.createElement(`p`);
@@ -44,5 +55,9 @@ api.getFilms()
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);
   });
+
+
+
+
 
 
