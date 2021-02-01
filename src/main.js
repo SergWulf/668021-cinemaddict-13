@@ -8,6 +8,7 @@ import FilterModel from "./model/filter.js";
 import FilterPresenter from "./presenter/filter.js";
 import Api from "./api.js";
 import {UpdateType} from "./const.js";
+import StatisticsView from "./view/statistics.js";
 
 window.filmsFromServer = [];
 
@@ -31,8 +32,11 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(siteMain, filterModel, filmsModel);
 const listFilmPresenter = new ListFilmPresenter(siteMain, filmsModel, commentsModel, filterModel, api);
 
+
 filterPresenter.init();
 listFilmPresenter.init();
+
+render(siteMain, new StatisticsView(), RenderPosition.BEFOREEND);
 
 api.getFilms()
   .then((films) => {
