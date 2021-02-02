@@ -30,6 +30,7 @@ export default class Filter {
 
     if (prevFilterComponent === null) {
       render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
+      console.log(`Панель фильтра и статистики нарисована!`);
       return;
     }
 
@@ -37,7 +38,12 @@ export default class Filter {
     remove(prevFilterComponent);
   }
 
+  getComponentView() {
+    return this._filterComponent;
+  }
+
   _handleModelEvent() {
+    console.log(`событие Init в презентере фильтров`);
     this.init();
   }
 

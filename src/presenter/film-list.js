@@ -6,6 +6,7 @@ import MostListFilmsView from "../view/most-films.js";
 import ButtonShowMoreView from "../view/film-more.js";
 import SortView from "../view/main-sort.js";
 import LoadingView from "../view/loading.js";
+import StatisticsView from "../view/statistics.js";
 import FilmPresenter from "../presenter/film.js";
 import {findCommentsByFilmId} from "../functions/find.js";
 import {FILM_COUNT, FILM_MOST_COUNT, FILM_TOP_COUNT} from "../mock/data.js";
@@ -14,13 +15,14 @@ import {UserAction, UpdateType, SortType, FilterType} from "../const.js";
 import {FILTER} from "../util.js";
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel, commentsModel, filterModel, api) {
+  constructor(filmListContainer, filmsModel, commentsModel, filterModel, api, filterPresenter) {
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
     this._filterModel = filterModel;
     this._filmListContainer = filmListContainer;
     this._renderedFilmCardsCount = 0;
     this._api = api;
+    this._filterPresenter = filterPresenter;
 
     this._isLoading = true;
 
@@ -30,7 +32,7 @@ export default class FilmList {
     this._loadingComponent = new LoadingView();
     this._sortComponent = new SortView();
     this._loadMoreButtonComponent = new ButtonShowMoreView();
-
+    this._statisticsComponent = new StatisticsView();
 
     this._filmListComponent = new MainContainerView();
     this._filmHeadListComponent = new HeadListFilmsView();
@@ -39,6 +41,7 @@ export default class FilmList {
 
     this._noFilmsComponent = new MainContainerNoFilmView();
 
+    this._handleStatisticsClick = this._handleStatisticsClick.bind(this);
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -54,6 +57,7 @@ export default class FilmList {
   }
 
   init() {
+    this._statisticsComponent.hide();
 
     this._currentFilterType = this._filterModel.getFilter();
     this._currentSortType = SortType.DEFAULT;
@@ -61,13 +65,27 @@ export default class FilmList {
 
     render(this._filmListComponent, this._sortComponent, RenderPosition.BEFOREEND);
     this._sortComponent.setClickButtonSortHandler(this._handleButtonSort);
+    this._filterPresenter.getComponentView().setStatisticsHandler(this._handleStatisticsClick);
 
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
     /*    render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
         render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);*/
+    render(this._filmListContainer, this._statisticsComponent, RenderPosition.BEFOREEND);
 
     this._renderFilmsContainer();
+  }
+
+  _handleStatisticsClick() {
+    alert(`Коллбэк!`);
+    this._currentSortType = SortType.DEFAULT;
+    if (this._filmListComponent.getElement().classList.contains(`visually-hidden`)) {
+      this._filmListComponent.show();
+      this._statisticsComponent.hide();
+    } else {
+      this._filmListComponent.hide();
+      this._statisticsComponent.show();
+    }
   }
 
   _handleSetOpenPopup(currentPopup) {
@@ -218,6 +236,8 @@ export default class FilmList {
         this._currentFilterType = this._filterModel.getFilter();
         this._currentSortType = SortType.DEFAULT;
         this._sortComponent.init();
+        console.log(`Update.Major в презентере списка фильмов`);
+        this._filterPresenter.getComponentView().setStatisticsHandler(this._handleStatisticsClick);
         this._replaceHeadContainer();
         break;
       case UpdateType.DELETE:

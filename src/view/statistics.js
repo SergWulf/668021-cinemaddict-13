@@ -61,7 +61,7 @@ export default class Statistics extends SmartView {
       films
     };
 
-    this._dateChangeHandler = this._dateChangeHandler.bind(this);
+    // this._dateChangeHandler = this._dateChangeHandler.bind(this);
   }
 
   removeElement() {
@@ -74,7 +74,7 @@ export default class Statistics extends SmartView {
   }
 
   restoreHandlers() {
-    this._setCharts();
+    // this._setCharts();
   }
 
 }

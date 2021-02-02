@@ -21,11 +21,15 @@ export default class Filter extends AbstractView {
     this._filters = filters;
     this._currentFilter = currentFilter;
     this._filterLinks = this.getElement().querySelectorAll(`.main-navigation__item`);
+    this._statisticsLink = this.getElement().querySelector(`.main-navigation__additional`);
 
     this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
+    this._statisticsHandler = this._statisticsHandler.bind(this);
+
   }
 
   getTemplate() {
+    console.log(`Начинаем рисовать компонент фильтров и статистики`);
     return createMainFilterTemplate(this._filters, this._currentFilter);
   }
 
@@ -39,5 +43,19 @@ export default class Filter extends AbstractView {
     this._filterLinks.forEach((filterLink) => {
       filterLink.addEventListener(`click`, this._filterTypeChangeHandler);
     });
+  }
+
+  _statisticsHandler(evt) {
+    evt.preventDefault();
+    this._callback.statisticsClick();
+  }
+
+  setStatisticsHandler(callback) {
+    this._callback.statisticsClick = callback;
+    console.log(`Ставим обработчик на кнопку статистики`);
+    this._statisticsLink.addEventListener(`click`, (evt) => {
+      console.log(`Ты где????????`);
+    });
+
   }
 }
