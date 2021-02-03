@@ -30,10 +30,11 @@ export default class Filter {
 
     if (prevFilterComponent === null) {
       render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
-      console.log(`Панель фильтра и статистики нарисована!`);
+      console.log(`Отрисовка первый раз панели фильтров и статистики`);
       return;
     }
 
+    console.log(`Перерисоввка панели фильтров и статистики`);
     replace(this._filterComponent, prevFilterComponent);
     remove(prevFilterComponent);
   }

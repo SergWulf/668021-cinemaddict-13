@@ -34,6 +34,7 @@ export default class Filter extends AbstractView {
   }
 
   _filterTypeChangeHandler(evt) {
+    console.log('Кликаем на фильтр');
     evt.preventDefault();
     this._callback.filterTypeChange(evt.target.getAttribute(`data-filter`));
   }

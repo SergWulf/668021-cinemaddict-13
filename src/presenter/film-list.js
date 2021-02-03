@@ -58,7 +58,7 @@ export default class FilmList {
 
   init() {
     this._statisticsComponent.hide();
-
+    console.log(`Событие init в списке фильмов`);
     this._currentFilterType = this._filterModel.getFilter();
     this._currentSortType = SortType.DEFAULT;
     this._activeFilterFilms = null;
@@ -225,10 +225,12 @@ export default class FilmList {
       case UpdateType.PATCH:
         // - обновить часть данные фильма
         this._filmPresenter[data.id].init(data);
+        console.log(`Update.PATCH в презентере списка фильмов`);
         break;
       case UpdateType.MINOR:
         // - обновить список (например, когда задача ушла в архив)
         this._filmPresenter[data.id].init(data);
+        console.log(`Update.MINOR в презентере списка фильмов`);
         this._replaceHeadContainer();
         break;
       case UpdateType.MAJOR:
@@ -250,6 +252,7 @@ export default class FilmList {
         break;
       case UpdateType.INIT:
         this._isLoading = false;
+        console.log(`Update.INIT в презентере списка фильмов`);
         remove(this._loadingComponent);
         this._renderFilmsContainer();
         break;
