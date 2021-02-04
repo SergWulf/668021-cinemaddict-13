@@ -29,12 +29,10 @@ export default class Filter extends AbstractView {
   }
 
   getTemplate() {
-    console.log(`Начинаем рисовать компонент фильтров и статистики`);
     return createMainFilterTemplate(this._filters, this._currentFilter);
   }
 
   _filterTypeChangeHandler(evt) {
-    console.log('Кликаем на фильтр');
     evt.preventDefault();
     this._callback.filterTypeChange(evt.target.getAttribute(`data-filter`));
   }
@@ -53,10 +51,6 @@ export default class Filter extends AbstractView {
 
   setStatisticsHandler(callback) {
     this._callback.statisticsClick = callback;
-    console.log(`Ставим обработчик на кнопку статистики`);
-    this._statisticsLink.addEventListener(`click`, (evt) => {
-      console.log(`Ты где????????`);
-    });
-
+    this._statisticsLink.addEventListener(`click`, this._statisticsHandler);
   }
 }

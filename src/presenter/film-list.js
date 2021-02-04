@@ -25,6 +25,7 @@ export default class FilmList {
     this._filterPresenter = filterPresenter;
 
     this._isLoading = true;
+    this._isStatistics = false;
 
     this._filmPresenter = {};
     this._openPopup = null;
@@ -58,7 +59,6 @@ export default class FilmList {
 
   init() {
     this._statisticsComponent.hide();
-    console.log(`Событие init в списке фильмов`);
     this._currentFilterType = this._filterModel.getFilter();
     this._currentSortType = SortType.DEFAULT;
     this._activeFilterFilms = null;
@@ -77,7 +77,6 @@ export default class FilmList {
   }
 
   _handleStatisticsClick() {
-    alert(`Коллбэк!`);
     this._currentSortType = SortType.DEFAULT;
     if (this._filmListComponent.getElement().classList.contains(`visually-hidden`)) {
       this._filmListComponent.show();
@@ -85,6 +84,7 @@ export default class FilmList {
     } else {
       this._filmListComponent.hide();
       this._statisticsComponent.show();
+      this._isStatistics = true;
     }
   }
 
@@ -221,25 +221,28 @@ export default class FilmList {
     // - обновить данные
     // - обновить данные и перерисовать список фильмов
     // - обновить данные фильтра и перерисовать список фильмов
+    this._filterPresenter.getComponentView().setStatisticsHandler(this._handleStatisticsClick);
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть данные фильма
+        // Изменяются данные только фильма
         this._filmPresenter[data.id].init(data);
-        console.log(`Update.PATCH в презентере списка фильмов`);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
+        // В этом случае изменяются данные фильма и список фильмов отсортирован
+        // именно по этому фильтру, то есть  удалить карточку из списка( перерисовать весь список).
         this._filmPresenter[data.id].init(data);
-        console.log(`Update.MINOR в презентере списка фильмов`);
         this._replaceHeadContainer();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        // - Происходит по щелчку на кнопку фильтра, необходимо сбросить сортировку
+        // и отфильтровать список.
         this._currentFilterType = this._filterModel.getFilter();
         this._currentSortType = SortType.DEFAULT;
+        if (this._isStatistics) {
+          this._filmListComponent.show();
+          this._statisticsComponent.hide();
+        }
         this._sortComponent.init();
-        console.log(`Update.Major в презентере списка фильмов`);
-        this._filterPresenter.getComponentView().setStatisticsHandler(this._handleStatisticsClick);
         this._replaceHeadContainer();
         break;
       case UpdateType.DELETE:
@@ -252,7 +255,6 @@ export default class FilmList {
         break;
       case UpdateType.INIT:
         this._isLoading = false;
-        console.log(`Update.INIT в презентере списка фильмов`);
         remove(this._loadingComponent);
         this._renderFilmsContainer();
         break;

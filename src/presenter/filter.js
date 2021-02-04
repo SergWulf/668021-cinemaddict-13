@@ -30,11 +30,9 @@ export default class Filter {
 
     if (prevFilterComponent === null) {
       render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
-      console.log(`Отрисовка первый раз панели фильтров и статистики`);
       return;
     }
 
-    console.log(`Перерисоввка панели фильтров и статистики`);
     replace(this._filterComponent, prevFilterComponent);
     remove(prevFilterComponent);
   }
@@ -44,7 +42,6 @@ export default class Filter {
   }
 
   _handleModelEvent() {
-    console.log(`событие Init в презентере фильтров`);
     this.init();
   }
 
