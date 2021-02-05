@@ -33,7 +33,7 @@ export default class FilmList {
     this._loadingComponent = new LoadingView();
     this._sortComponent = new SortView();
     this._loadMoreButtonComponent = new ButtonShowMoreView();
-    this._statisticsComponent = new StatisticsView();
+    this._statisticsComponent = null;
 
     this._filmListComponent = new MainContainerView();
     this._filmHeadListComponent = new HeadListFilmsView();
@@ -58,7 +58,10 @@ export default class FilmList {
   }
 
   init() {
-    this._statisticsComponent.hide();
+    if (this._statisticsComponent) {
+      this._statisticsComponent.hide();
+    }
+
     this._currentFilterType = this._filterModel.getFilter();
     this._currentSortType = SortType.DEFAULT;
     this._activeFilterFilms = null;
@@ -71,7 +74,7 @@ export default class FilmList {
     render(this._filmListComponent, this._filmHeadListComponent, RenderPosition.BEFOREEND);
     /*    render(this._filmListComponent, this._filmTopListComponent, RenderPosition.BEFOREEND);
         render(this._filmListComponent, this._filmMostListComponent, RenderPosition.BEFOREEND);*/
-    render(this._filmListContainer, this._statisticsComponent, RenderPosition.BEFOREEND);
+
 
     this._renderFilmsContainer();
   }
@@ -256,6 +259,10 @@ export default class FilmList {
       case UpdateType.INIT:
         this._isLoading = false;
         remove(this._loadingComponent);
+        // временно отображаем статичную статистику :)
+        this._statisticsComponent = new StatisticsView(FILTER[FilterType.WATCHED](this._filmsModel.getFilms()));
+        this._statisticsComponent.init();
+        render(this._filmListContainer, this._statisticsComponent, RenderPosition.BEFOREEND);
         this._renderFilmsContainer();
         break;
     }

@@ -55,7 +55,8 @@ export default class Films extends Observer {
           "isWatchList": film.user_details.watchlist,
           "isWatched": film.user_details.already_watched,
           "isFavorite": film.user_details.favorite,
-          "countComments": film.comments.length
+          "countComments": film.comments.length,
+          "watchingDate": film.user_details.watching_date
         }
     );
 
@@ -80,7 +81,7 @@ export default class Films extends Observer {
             "watchlist": film.isWatchList,
             "already_watched": film.isWatched,
             "favorite": film.isFavorite,
-            "watching_date": null
+            "watching_date": film.watchingDate
           }
         }
     );

@@ -2,9 +2,79 @@ import dayjs from "dayjs";
 import SmartView from "./smart.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {runtimeToHourAndMinutes} from "../util.js";
+import {films} from "../mock/data";
+
+const BAR_HEIGHT = 50;
+const statisticCtx = document.querySelector(`.statistic__chart`);
+// 1. Рассчитаем сколько всего сколько просмотрено вильмов, это фильтр watched.length.
+// 2. В этом же массиве возьмем данные в минутах и отобразим из в часах и минутах.
+//
+
+/*
+// Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
+statisticCtx.height = BAR_HEIGHT * 5;
+
+const myChart = new Chart(statisticCtx, {
+  plugins: [ChartDataLabels],
+  type: `horizontalBar`,
+  data: {
+    labels: [`Sci-Fi`, `Animation`, `Fantasy`, `Comedy`, `TV Series`],
+    datasets: [{
+      data: [11, 8, 7, 4, 3],
+      backgroundColor: `#ffe800`,
+      hoverBackgroundColor: `#ffe800`,
+      anchor: `start`
+    }]
+  },
+  options: {
+    plugins: {
+      datalabels: {
+        font: {
+          size: 20
+        },
+        color: `#ffffff`,
+        anchor: 'start',
+        align: 'start',
+        offset: 40,
+      }
+    },
+    scales: {
+      yAxes: [{
+        ticks: {
+          fontColor: `#ffffff`,
+          padding: 100,
+          fontSize: 20
+        },
+        gridLines: {
+          display: false,
+          drawBorder: false
+        },
+        barThickness: 24
+      }],
+      xAxes: [{
+        ticks: {
+          display: false,
+          beginAtZero: true
+        },
+        gridLines: {
+          display: false,
+          drawBorder: false
+        },
+      }],
+    },
+    legend: {
+      display: false
+    },
+    tooltips: {
+      enabled: false
+    }
+  }
+});*/
 
 
-const createStatisticsTemplate = () => {
+const createStatisticsTemplate = (data) => {
+  const filmsRuntime = runtimeToHourAndMinutes(parseInt(data.allDuration, 10));
   return `<section class="statistic">
     <p class="statistic__rank">
       Your rank
@@ -34,15 +104,15 @@ const createStatisticsTemplate = () => {
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${data.watched} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+        <p class="statistic__item-text">${filmsRuntime.hours} <span class="statistic__item-description">h</span> ${filmsRuntime.minutes} <span class="statistic__item-description">m</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">Sci-Fi</p>
+        <p class="statistic__item-text">${data.countGenres[0][0]}</p>
       </li>
     </ul>
 
@@ -60,8 +130,20 @@ export default class Statistics extends SmartView {
     this._data = {
       films
     };
-
+    this._getCountsGenres();
     // this._dateChangeHandler = this._dateChangeHandler.bind(this);
+  }
+
+  init() {
+    this._data.statistics = Object.assign({},
+        {
+          "watched": this._data.films.length,
+          "allDuration": this._data.films.reduce((allRuntime, film) => {
+            return allRuntime + film.runtime;
+          }, 0),
+          "countGenres": this._getCountsGenres()
+        });
+    console.log(this._data.statistics.countGenres);
   }
 
   removeElement() {
@@ -70,11 +152,35 @@ export default class Statistics extends SmartView {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._data);
+    return createStatisticsTemplate(this._data.statistics);
   }
 
   restoreHandlers() {
     // this._setCharts();
   }
 
+  _getCountsGenres() {
+    // Цикло по массивам genre
+    const nameGenres = new Set();
+    const countsGenres = new Map();
+    this._data.films.forEach((film) => {
+      film.genres.forEach((genre) => {
+        if (nameGenres.has(genre)) {
+          countsGenres.set(genre, parseInt(countsGenres.get(genre), 10) + 1);
+        }
+        if (!nameGenres.has(genre)) {
+          nameGenres.add(genre);
+          countsGenres.set(genre, 1);
+        }
+      });
+    });
+
+    return [...countsGenres].slice().sort((prev, next) => {
+      return next[1] - prev[1];
+    });
+  }
+
+  _getTopGenre() {
+
+  }
 }
