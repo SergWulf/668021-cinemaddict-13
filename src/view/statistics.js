@@ -3,75 +3,13 @@ import SmartView from "./smart.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {runtimeToHourAndMinutes} from "../util.js";
-import {films} from "../mock/data";
 
-const BAR_HEIGHT = 50;
-const statisticCtx = document.querySelector(`.statistic__chart`);
-// 1. Рассчитаем сколько всего сколько просмотрено вильмов, это фильтр watched.length.
-// 2. В этом же массиве возьмем данные в минутах и отобразим из в часах и минутах.
-//
-
-/*
-// Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
-statisticCtx.height = BAR_HEIGHT * 5;
-
-const myChart = new Chart(statisticCtx, {
-  plugins: [ChartDataLabels],
-  type: `horizontalBar`,
-  data: {
-    labels: [`Sci-Fi`, `Animation`, `Fantasy`, `Comedy`, `TV Series`],
-    datasets: [{
-      data: [11, 8, 7, 4, 3],
-      backgroundColor: `#ffe800`,
-      hoverBackgroundColor: `#ffe800`,
-      anchor: `start`
-    }]
-  },
-  options: {
-    plugins: {
-      datalabels: {
-        font: {
-          size: 20
-        },
-        color: `#ffffff`,
-        anchor: 'start',
-        align: 'start',
-        offset: 40,
-      }
-    },
-    scales: {
-      yAxes: [{
-        ticks: {
-          fontColor: `#ffffff`,
-          padding: 100,
-          fontSize: 20
-        },
-        gridLines: {
-          display: false,
-          drawBorder: false
-        },
-        barThickness: 24
-      }],
-      xAxes: [{
-        ticks: {
-          display: false,
-          beginAtZero: true
-        },
-        gridLines: {
-          display: false,
-          drawBorder: false
-        },
-      }],
-    },
-    legend: {
-      display: false
-    },
-    tooltips: {
-      enabled: false
-    }
-  }
-});*/
-
+const TimeInSecond = {
+  DAY: 86400,
+  WEEK: 604800,
+  MONTH: 18144000,
+  YEAR: 217728000
+};
 
 const createStatisticsTemplate = (data) => {
   const filmsRuntime = runtimeToHourAndMinutes(parseInt(data.allDuration, 10));
@@ -126,13 +64,28 @@ const createStatisticsTemplate = (data) => {
 export default class Statistics extends SmartView {
   constructor(films) {
     super();
-
+    this._currentTime = new Date();
+    this._timesFilms = films.filter((film) => {
+      return
+    });
     this._data = {
       films
     };
-    this._getCountsGenres();
     // this._dateChangeHandler = this._dateChangeHandler.bind(this);
   }
+
+  // При нажатии на любой временной промежуток, происходит событие
+  // 1. Нужно взять весь массив watched и проверить параметр watched.date на временные рамки.
+  // Today: проверка у фильма дня даты, если день даты совпадает с сегодняшним, то фильма проходит под условие.
+  // Week: Берётся текущая дата и дата просмотра, обе переводятся в таймстамп. 1-ая дата вычитается из 2-ой.
+  // Узнаем количество дней, если меньше или равно 7 дней, то фильм проходит к условиями.
+  // Month: Если кол-во дней меньше или равно 30, то фильм подходит
+  // Year: Если кол-во дней меньше или равно 365, то фильм проходит
+
+
+  /*
+
+  * */
 
   init() {
     this._data.statistics = Object.assign({},
@@ -143,7 +96,66 @@ export default class Statistics extends SmartView {
           }, 0),
           "countGenres": this._getCountsGenres()
         });
-    console.log(this._data.statistics.countGenres);
+    const BAR_HEIGHT = 50;
+    const statisticCtx = this.getElement().querySelector(`.statistic__chart`);
+    statisticCtx.height = BAR_HEIGHT * this._data.statistics.countGenres.length;
+
+    const myChart = new Chart(statisticCtx, {
+      plugins: [ChartDataLabels],
+      type: `horizontalBar`,
+      data: {
+        labels: this._data.statistics.countGenres.map((genreName) => genreName[0]),
+        datasets: [{
+          data: this._data.statistics.countGenres.map((genreName) => genreName[1]),
+          backgroundColor: `#ffe800`,
+          hoverBackgroundColor: `#ffe800`,
+          anchor: `start`
+        }]
+      },
+      options: {
+        plugins: {
+          datalabels: {
+            font: {
+              size: 20
+            },
+            color: `#ffffff`,
+            anchor: `start`,
+            align: `start`,
+            offset: 40,
+          }
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              fontColor: `#ffffff`,
+              padding: 100,
+              fontSize: 20
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false
+            },
+            barThickness: 24
+          }],
+          xAxes: [{
+            ticks: {
+              display: false,
+              beginAtZero: true
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false
+            },
+          }],
+        },
+        legend: {
+          display: false
+        },
+        tooltips: {
+          enabled: false
+        }
+      }
+    });
   }
 
   removeElement() {

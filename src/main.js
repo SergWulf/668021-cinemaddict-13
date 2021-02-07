@@ -11,7 +11,7 @@ import {UpdateType} from "./const.js";
 
 window.filmsFromServer = [];
 
-const AUTHORIZATION = `Basic TwentyOneToLoadBomb`;
+const AUTHORIZATION = `Basic TwentyOneToLoadBomb211`;
 const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
 const api = new Api(END_POINT, AUTHORIZATION);
 
