@@ -3,12 +3,10 @@ import SmartView from "./smart.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {runtimeToHourAndMinutes} from "../util.js";
+import {TimeInMSecond} from "../const";
 
-const TimeInSecond = {
-  DAY: 86400,
-  WEEK: 604800,
-  MONTH: 18144000,
-  YEAR: 217728000
+const FILTER_TIME = {
+
 };
 
 const createStatisticsTemplate = (data) => {
@@ -64,14 +62,26 @@ const createStatisticsTemplate = (data) => {
 export default class Statistics extends SmartView {
   constructor(films) {
     super();
-    this._currentTime = new Date();
-    this._timesFilms = films.filter((film) => {
-      return
+    console.log(`Я конструктор`);
+    this._data.timeFilms = films.filter((film) => {
+      // обработать ситуацию, когда нету результата
+      return this.checkTime(film.watchingDate);
     });
-    this._data = {
+    console.log(this._data.timeFilms);
+    /*    this._data = {
       films
-    };
+    };*/
     // this._dateChangeHandler = this._dateChangeHandler.bind(this);
+  }
+
+  checkTime(dateFilm) {
+    const currentTime = new Date();
+    const timeFilm = new Date(dateFilm);
+    const diffTime = currentTime.getTime() - timeFilm.getTime();
+    if (diffTime < TimeInMSecond.DAY) {
+      return true;
+    }
+    return false;
   }
 
   // При нажатии на любой временной промежуток, происходит событие
@@ -90,11 +100,11 @@ export default class Statistics extends SmartView {
   init() {
     this._data.statistics = Object.assign({},
         {
-          "watched": this._data.films.length,
-          "allDuration": this._data.films.reduce((allRuntime, film) => {
+          "watched": this._data.timeFilms.length,
+          "allDuration": this._data.timeFilms.reduce((allRuntime, film) => {
             return allRuntime + film.runtime;
           }, 0),
-          "countGenres": this._getCountsGenres()
+          "countGenres": this._getCountsGenres(this._data.timeFilms)
         });
     const BAR_HEIGHT = 50;
     const statisticCtx = this.getElement().querySelector(`.statistic__chart`);
@@ -171,11 +181,11 @@ export default class Statistics extends SmartView {
     // this._setCharts();
   }
 
-  _getCountsGenres() {
+  _getCountsGenres(timeFilms) {
     // Цикло по массивам genre
     const nameGenres = new Set();
     const countsGenres = new Map();
-    this._data.films.forEach((film) => {
+    timeFilms.forEach((film) => {
       film.genres.forEach((genre) => {
         if (nameGenres.has(genre)) {
           countsGenres.set(genre, parseInt(countsGenres.get(genre), 10) + 1);

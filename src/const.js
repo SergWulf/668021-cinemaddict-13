@@ -28,3 +28,10 @@ export const SortType = {
   MOST: `most`
 };
 
+export const TimeInMSecond = {
+  DAY: 86400000,
+  WEEK: 604800000,
+  MONTH: 18144000000,
+  YEAR: 217728000000
+};
+
