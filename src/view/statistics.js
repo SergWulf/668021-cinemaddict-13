@@ -3,7 +3,7 @@ import SmartView from "./smart.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {runtimeToHourAndMinutes} from "../util.js";
-import {TimeInMSecond} from "../const";
+import {StatisticType, TimeInMSecond} from "../const";
 
 const FILTER_TIME = {
 
@@ -62,15 +62,14 @@ const createStatisticsTemplate = (data) => {
 export default class Statistics extends SmartView {
   constructor(films) {
     super();
+    this._activeStatistic = StatisticType.ALL;
     console.log(`Я конструктор`);
     this._data.timeFilms = films.filter((film) => {
       // обработать ситуацию, когда нету результата
       return this.checkTime(film.watchingDate);
     });
     console.log(this._data.timeFilms);
-    /*    this._data = {
-      films
-    };*/
+
     // this._dateChangeHandler = this._dateChangeHandler.bind(this);
   }
 
@@ -84,13 +83,11 @@ export default class Statistics extends SmartView {
     return false;
   }
 
-  // При нажатии на любой временной промежуток, происходит событие
-  // 1. Нужно взять весь массив watched и проверить параметр watched.date на временные рамки.
+  // 1. При нажатии на кнопку фильтра времени происходит событие.
+  // 2. Обработчик события делает выбранный фильтр текущим.
+  // 3. Вызывается init c нужным массивом, создается новый компонент с новыми данными, исходя из фильтра.
+  // 4.
   // Today: проверка у фильма дня даты, если день даты совпадает с сегодняшним, то фильма проходит под условие.
-  // Week: Берётся текущая дата и дата просмотра, обе переводятся в таймстамп. 1-ая дата вычитается из 2-ой.
-  // Узнаем количество дней, если меньше или равно 7 дней, то фильм проходит к условиями.
-  // Month: Если кол-во дней меньше или равно 30, то фильм подходит
-  // Year: Если кол-во дней меньше или равно 365, то фильм проходит
 
 
   /*
@@ -98,6 +95,7 @@ export default class Statistics extends SmartView {
   * */
 
   init() {
+
     this._data.statistics = Object.assign({},
         {
           "watched": this._data.timeFilms.length,
@@ -106,6 +104,45 @@ export default class Statistics extends SmartView {
           }, 0),
           "countGenres": this._getCountsGenres(this._data.timeFilms)
         });
+
+    this._renderChart();
+  }
+
+  removeElement() {
+    super.removeElement();
+
+  }
+
+  getTemplate() {
+    return createStatisticsTemplate(this._data.statistics);
+  }
+
+  restoreHandlers() {
+    // this._setCharts();
+  }
+
+  _getCountsGenres(timeFilms) {
+    // Цикло по массивам genre
+    const nameGenres = new Set();
+    const countsGenres = new Map();
+    timeFilms.forEach((film) => {
+      film.genres.forEach((genre) => {
+        if (nameGenres.has(genre)) {
+          countsGenres.set(genre, parseInt(countsGenres.get(genre), 10) + 1);
+        }
+        if (!nameGenres.has(genre)) {
+          nameGenres.add(genre);
+          countsGenres.set(genre, 1);
+        }
+      });
+    });
+
+    return [...countsGenres].slice().sort((prev, next) => {
+      return next[1] - prev[1];
+    });
+  }
+
+  _renderChart() {
     const BAR_HEIGHT = 50;
     const statisticCtx = this.getElement().querySelector(`.statistic__chart`);
     statisticCtx.height = BAR_HEIGHT * this._data.statistics.countGenres.length;
@@ -166,43 +203,5 @@ export default class Statistics extends SmartView {
         }
       }
     });
-  }
-
-  removeElement() {
-    super.removeElement();
-
-  }
-
-  getTemplate() {
-    return createStatisticsTemplate(this._data.statistics);
-  }
-
-  restoreHandlers() {
-    // this._setCharts();
-  }
-
-  _getCountsGenres(timeFilms) {
-    // Цикло по массивам genre
-    const nameGenres = new Set();
-    const countsGenres = new Map();
-    timeFilms.forEach((film) => {
-      film.genres.forEach((genre) => {
-        if (nameGenres.has(genre)) {
-          countsGenres.set(genre, parseInt(countsGenres.get(genre), 10) + 1);
-        }
-        if (!nameGenres.has(genre)) {
-          nameGenres.add(genre);
-          countsGenres.set(genre, 1);
-        }
-      });
-    });
-
-    return [...countsGenres].slice().sort((prev, next) => {
-      return next[1] - prev[1];
-    });
-  }
-
-  _getTopGenre() {
-
   }
 }

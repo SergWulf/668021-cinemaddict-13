@@ -28,6 +28,14 @@ export const SortType = {
   MOST: `most`
 };
 
+export const StatisticType = {
+  ALL: `ALL`,
+  YEAR: `YEAR`,
+  MONTH: `MONTH`,
+  WEEK: `WEEK`,
+  DAY: `DAY`
+}
+
 export const TimeInMSecond = {
   DAY: 86400000,
   WEEK: 604800000,
