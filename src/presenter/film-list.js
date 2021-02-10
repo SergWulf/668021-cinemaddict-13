@@ -43,6 +43,7 @@ export default class FilmList {
     this._noFilmsComponent = new MainContainerNoFilmView();
 
     this._handleStatisticsClick = this._handleStatisticsClick.bind(this);
+    this._handleClickChangeFilter = this._handleClickChangeFilter.bind(this);
 
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -77,6 +78,10 @@ export default class FilmList {
 
 
     this._renderFilmsContainer();
+  }
+
+  _handleClickChangeFilter() {
+    console.log(`Я в презентере списка фильмов, я коллбек для фильтрации экрана статистики по нажатию на фильтр времени`);
   }
 
   _handleStatisticsClick() {
@@ -262,6 +267,7 @@ export default class FilmList {
         // временно отображаем статичную статистику :)
         this._statisticsComponent = new StatisticsView(FILTER[FilterType.WATCHED](this._filmsModel.getFilms()));
         this._statisticsComponent.init();
+        this._statisticsComponent.setClickChangeFilterHandler(this._handleClickChangeFilter);
         render(this._filmListContainer, this._statisticsComponent, RenderPosition.BEFOREEND);
         this._renderFilmsContainer();
         break;

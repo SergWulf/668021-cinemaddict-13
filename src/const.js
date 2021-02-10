@@ -34,7 +34,7 @@ export const StatisticType = {
   MONTH: `MONTH`,
   WEEK: `WEEK`,
   DAY: `DAY`
-}
+};
 
 export const TimeInMSecond = {
   DAY: 86400000,

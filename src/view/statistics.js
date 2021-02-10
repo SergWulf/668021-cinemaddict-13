@@ -62,7 +62,7 @@ const createStatisticsTemplate = (data) => {
 export default class Statistics extends SmartView {
   constructor(films) {
     super();
-    this._activeStatistic = StatisticType.ALL;
+    this._activeStatisticFilter = StatisticType.ALL;
     console.log(`Я конструктор`);
     this._data.timeFilms = films.filter((film) => {
       // обработать ситуацию, когда нету результата
@@ -70,7 +70,12 @@ export default class Statistics extends SmartView {
     });
     console.log(this._data.timeFilms);
 
-    // this._dateChangeHandler = this._dateChangeHandler.bind(this);
+    this._clickChangeFilterHandler = this._clickChangeFilterHandler.bind(this);
+  }
+
+  setClickChangeFilterHandler(callback) {
+    this._callback.changeFilter = callback;
+    this.getElement().querySelector(`.statistic__filters`).addEventListener(`change`, this._clickChangeFilterHandler);
   }
 
   checkTime(dateFilm) {
@@ -119,6 +124,11 @@ export default class Statistics extends SmartView {
 
   restoreHandlers() {
     // this._setCharts();
+  }
+
+  _clickChangeFilterHandler(evt) {
+    console.log(evt.target);
+    this._callback.changeFilter();
   }
 
   _getCountsGenres(timeFilms) {
